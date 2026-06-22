@@ -3,11 +3,11 @@ import { Plus } from 'lucide-react'
 import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supabase'
 import type { TitleAgentCategory } from '@/lib/types'
 
-const CATEGORY_BADGE: Record<TitleAgentCategory, string> = {
-  UNICORN: 'badge-unicorn',
-  DIAMOND: 'badge-diamond',
-  GOLD: 'badge-gold',
-  SILVER: 'badge-silver',
+const CATEGORY_TIER: Record<TitleAgentCategory, string> = {
+  UNICORN: 'tier-unicorn',
+  DIAMOND: 'tier-diamond',
+  GOLD: 'tier-gold',
+  SILVER: 'tier-silver',
 }
 
 export default async function AgentsPage() {
@@ -73,8 +73,7 @@ export default async function AgentsPage() {
             <table className="ats-table">
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Agency</th>
+                  <th>Agency Name</th>
                   <th>Category</th>
                   <th>WFG Rep</th>
                   <th>Contacts</th>
@@ -120,22 +119,19 @@ export default async function AgentsPage() {
                         </Link>
                       </div>
                     </td>
-                    <td style={{ color: 'var(--muted-foreground)' }}>{agent.agency_name ?? '—'}</td>
                     <td>
                       {agent.category ? (
-                        <span className={`badge ${CATEGORY_BADGE[agent.category]}`}>
+                        <span className={`tier-mark ${CATEGORY_TIER[agent.category]}`}>
                           {agent.category}
                         </span>
-                      ) : '—'}
+                      ) : <span style={{ color: 'var(--ats-text-3)' }}>—</span>}
                     </td>
                     <td style={{ color: 'var(--muted-foreground)' }}>{agent.wfg_rep ?? '—'}</td>
                     <td style={{ color: 'var(--muted-foreground)' }}>
                       {agent.contacts?.length ?? 0}
                     </td>
-                    <td>
-                      <span className="badge badge-processed">
-                        {(agent.sessions as unknown as { count: number }[])?.[0]?.count ?? 0}
-                      </span>
+                    <td style={{ fontWeight: 600, color: 'var(--ats-text)' }}>
+                      {(agent.sessions as unknown as { count: number }[])?.[0]?.count ?? 0}
                     </td>
                     <td>
                       <Link

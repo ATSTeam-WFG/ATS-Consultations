@@ -1,11 +1,11 @@
 import Link from 'next/link'
 import type { Agent, TitleAgentCategory } from '@/lib/types'
 
-const CATEGORY_BADGE: Record<TitleAgentCategory, string> = {
-  UNICORN: 'badge-unicorn',
-  DIAMOND: 'badge-diamond',
-  GOLD: 'badge-gold',
-  SILVER: 'badge-silver',
+const CATEGORY_TIER: Record<TitleAgentCategory, string> = {
+  UNICORN: 'tier-unicorn',
+  DIAMOND: 'tier-diamond',
+  GOLD: 'tier-gold',
+  SILVER: 'tier-silver',
 }
 
 interface AgentCardProps {
@@ -60,7 +60,7 @@ export function AgentCard({ agent }: AgentCardProps) {
           {agent.agency_name}
         </div>
         {agent.category && (
-          <span className={`badge ${CATEGORY_BADGE[agent.category]}`} style={{ fontSize: '0.6875rem' }}>
+          <span className={`tier-mark ${CATEGORY_TIER[agent.category]}`}>
             {agent.category}
           </span>
         )}

@@ -144,13 +144,13 @@
   --ats-text-3: #9ca3af;
 
   /* Accent — indigo */
-  --ats-indigo: #4f46e5;
-  --ats-indigo-dark: #4338ca;
+  --ats-indigo: #6366f1;
+  --ats-indigo-dark: #4f46e5;
   --ats-indigo-light: #eef2ff;
 
   /* Legacy aliases so components referencing --ats-blue still work */
-  --ats-blue: #4f46e5;
-  --ats-blue-dark: #4338ca;
+  --ats-blue: #6366f1;
+  --ats-blue-dark: #4f46e5;
   --ats-blue-light: #eef2ff;
 
   /* Sidebar */
@@ -196,8 +196,8 @@
 
 .sidebar-logo-seal {
   flex-shrink: 0;
-  margin-top: 0.3rem;
-  filter: drop-shadow(0 0 6px rgba(129, 140, 248, 0.6));
+  margin-top: 0.2rem;
+  filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.6));
 }
 
 .sidebar-logo-name {
@@ -209,7 +209,7 @@
 }
 
 .sidebar-logo-name span {
-  color: #818cf8;
+  color: var(--ats-indigo);
   font-weight: 700;
 }
 
@@ -218,7 +218,7 @@
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(129, 140, 248, 0.45);
+  color: rgba(99, 102, 241, 0.45);
   margin-top: 0.25rem;
 }
 
@@ -472,22 +472,48 @@
   text-align: left;
   padding: 0.75rem 1.25rem;
   font-size: 0.6875rem;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--ats-text-3);
+  letter-spacing: 0.07em;
+  color: #64748b;
   background: var(--ats-bg);
   border-bottom: 1px solid var(--ats-border);
 }
 
 .ats-table td {
-  padding: 0.9375rem 1.25rem;
+  padding: 1rem 1.25rem;
   border-bottom: 1px solid var(--ats-border);
   color: var(--ats-text-2);
 }
 
 .ats-table tr:last-child td { border-bottom: none; }
-.ats-table tbody tr:hover td { background: #f9fafc; }
+.ats-table tbody tr:hover td { background: #f5f6ff; }
+
+/* ============================================================
+   Tier marks — replaces pill badges for agent categories
+   ============================================================ */
+.tier-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--ats-text);
+}
+
+.tier-mark::before {
+  content: '◆';
+  font-size: 0.4rem;
+  line-height: 1;
+  position: relative;
+  top: -0.5px;
+}
+
+.tier-diamond::before { color: #6366f1; }
+.tier-gold::before    { color: #d97706; }
+.tier-silver::before  { color: #94a3b8; }
+.tier-unicorn::before { color: #9333ea; }
 
 /* ============================================================
    Loading

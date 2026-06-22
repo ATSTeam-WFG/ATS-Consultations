@@ -58,9 +58,9 @@ export function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
-        <svg className="sidebar-logo-seal" width="13" height="13" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-          <polygon points="6,1.5 9.9,3.75 9.9,8.25 6,10.5 2.1,8.25 2.1,3.75" stroke="#818cf8" strokeWidth="1.2" strokeLinejoin="round" opacity="0.9" />
-          <circle cx="6" cy="6" r="1.6" fill="#818cf8" />
+        <svg className="sidebar-logo-seal" width="17" height="17" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <polygon points="6,1.5 9.9,3.75 9.9,8.25 6,10.5 2.1,8.25 2.1,3.75" stroke="#6366f1" strokeWidth="1.2" strokeLinejoin="round" opacity="0.9" />
+          <circle cx="6" cy="6" r="1.6" fill="#6366f1" />
         </svg>
         <div>
           <div className="sidebar-logo-name">ATS <span>Consultations</span></div>

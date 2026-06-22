@@ -4,10 +4,10 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
-  const { email } = await request.json()
+  const { email, password: submittedPassword } = await request.json()
 
-  if (!email) {
-    return NextResponse.json({ error: 'Email required' }, { status: 400 })
+  if (!email || !submittedPassword) {
+    return NextResponse.json({ error: 'Email and password are required' }, { status: 400 })
   }
 
   // Check allowlist
@@ -16,10 +16,14 @@ export async function POST(request: Request) {
     .map((e) => e.trim().toLowerCase())
 
   if (!allowed.includes(email.toLowerCase())) {
-    return NextResponse.json({ error: 'You are not authorized to access this app.' }, { status: 403 })
+    return NextResponse.json({ error: 'Invalid credentials.' }, { status: 403 })
   }
 
   const password = process.env.APP_PASSWORD!
+
+  if (submittedPassword !== password) {
+    return NextResponse.json({ error: 'Invalid credentials.' }, { status: 401 })
+  }
   const cookieStore = await cookies()
 
   const admin = createClient(
