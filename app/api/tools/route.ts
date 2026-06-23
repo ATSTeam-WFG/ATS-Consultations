@@ -11,7 +11,6 @@ export async function GET() {
   const { data, error } = await db
     .from('tool_recommendations')
     .select('*')
-    .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

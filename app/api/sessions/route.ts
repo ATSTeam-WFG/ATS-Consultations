@@ -13,7 +13,6 @@ export async function GET(request: Request) {
   let query = db
     .from('sessions')
     .select('*, agents(name, agency_name, category), session_analysis(summary, problem_tags)')
-    .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
   if (agentId) query = query.eq('agent_id', agentId)

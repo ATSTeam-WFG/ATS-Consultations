@@ -15,7 +15,6 @@ export async function GET(request: Request) {
   let query = db
     .from('playbooks')
     .select('*')
-    .eq('user_id', user.id)
     .order('updated_at', { ascending: false })
 
   if (status) query = query.eq('status', status)

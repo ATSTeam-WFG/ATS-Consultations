@@ -7,7 +7,6 @@ export async function GET() {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const db = createServiceRoleClient()
-  const uid = user.id
 
   const [
     { count: totalAgents },
@@ -18,13 +17,13 @@ export async function GET() {
     { data: trends },
     { data: topPlaybooks },
   ] = await Promise.all([
-    db.from('agents').select('*', { count: 'exact', head: true }).eq('user_id', uid),
-    db.from('sessions').select('*', { count: 'exact', head: true }).eq('user_id', uid),
-    db.from('sessions').select('*', { count: 'exact', head: true }).eq('user_id', uid).eq('status', 'processed'),
-    db.from('sessions').select('*', { count: 'exact', head: true }).eq('user_id', uid).eq('status', 'pending'),
-    db.from('session_analysis').select('problem_tags, sessions!inner(user_id)').eq('sessions.user_id', uid),
-    db.from('trends').select('*').eq('user_id', uid).order('session_count', { ascending: false }).limit(5),
-    db.from('playbooks').select('id, title, usage_count').eq('user_id', uid).order('usage_count', { ascending: false }).limit(5),
+    db.from('agents').select('*', { count: 'exact', head: true }),
+    db.from('sessions').select('*', { count: 'exact', head: true }),
+    db.from('sessions').select('*', { count: 'exact', head: true }).eq('status', 'processed'),
+    db.from('sessions').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+    db.from('session_analysis').select('problem_tags'),
+    db.from('trends').select('*').order('session_count', { ascending: false }).limit(5),
+    db.from('playbooks').select('id, title, usage_count').order('usage_count', { ascending: false }).limit(5),
   ])
 
   // Aggregate problem tags
