@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import type { Playbook } from '@/lib/types'
 import { BookOpen, Clock, BarChart3 } from 'lucide-react'
