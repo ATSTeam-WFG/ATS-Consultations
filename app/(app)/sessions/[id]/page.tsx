@@ -20,7 +20,6 @@ export default async function SessionDetailPage({
     .from('sessions')
     .select('*, agents(name, agency_name, category), session_analysis(*)')
     .eq('id', id)
-    .eq('user_id', user!.id)
     .single()
 
   if (error || !session) notFound()

@@ -12,7 +12,6 @@ export default async function PlaybooksPage() {
   const { data: playbooks } = await db
     .from('playbooks')
     .select('*')
-    .eq('user_id', user!.id)
     .order('updated_at', { ascending: false })
 
   return (

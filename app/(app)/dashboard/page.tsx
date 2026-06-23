@@ -1,4 +1,4 @@
-import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supabase'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { MetricCard } from '@/components/dashboard/MetricCard'
 import { TopProblemsChart } from '@/components/dashboard/TopProblemsChart'
 import { TrendAlerts } from '@/components/dashboard/TrendAlerts'
@@ -6,10 +6,6 @@ import { TopPlaybooks } from '@/components/dashboard/TopPlaybooks'
 import type { Trend } from '@/lib/types'
 
 export default async function DashboardPage() {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const uid = user!.id
-
   const db = createServiceRoleClient()
   const [
     { count: totalAgents },
@@ -20,13 +16,13 @@ export default async function DashboardPage() {
     { data: trends },
     { data: topPlaybooks },
   ] = await Promise.all([
-    db.from('agents').select('*', { count: 'exact', head: true }).eq('user_id', uid),
-    db.from('sessions').select('*', { count: 'exact', head: true }).eq('user_id', uid),
-    db.from('sessions').select('*', { count: 'exact', head: true }).eq('user_id', uid).eq('status', 'processed'),
-    db.from('sessions').select('*', { count: 'exact', head: true }).eq('user_id', uid).eq('status', 'pending'),
-    db.from('session_analysis').select('problem_tags, sessions!inner(user_id)').eq('sessions.user_id', uid),
-    db.from('trends').select('*').eq('user_id', uid).order('session_count', { ascending: false }).limit(5),
-    db.from('playbooks').select('id, title, usage_count').eq('user_id', uid).order('usage_count', { ascending: false }).limit(5),
+    db.from('agents').select('*', { count: 'exact', head: true }),
+    db.from('sessions').select('*', { count: 'exact', head: true }),
+    db.from('sessions').select('*', { count: 'exact', head: true }).eq('status', 'processed'),
+    db.from('sessions').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+    db.from('session_analysis').select('problem_tags'),
+    db.from('trends').select('*').order('session_count', { ascending: false }).limit(5),
+    db.from('playbooks').select('id, title, usage_count').order('usage_count', { ascending: false }).limit(5),
   ])
 
   // Aggregate problem tags

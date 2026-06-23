@@ -18,7 +18,6 @@ export default async function AgentsPage() {
   const { data: agents } = await db
     .from('agents')
     .select('*, sessions(count)')
-    .eq('user_id', user!.id)
     .order('created_at', { ascending: false })
 
   return (
