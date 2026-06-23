@@ -16,7 +16,6 @@ export async function GET(
     .from('playbooks')
     .select('*')
     .eq('id', id)
-    .eq('user_id', user.id)
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 404 })

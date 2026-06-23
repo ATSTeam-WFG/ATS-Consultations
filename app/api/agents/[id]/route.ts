@@ -16,7 +16,6 @@ export async function GET(
     .from('agents')
     .select('id, name, email, agency_name, category, wfg_rep, contacts, notes, created_at, updated_at, sessions(*)')
     .eq('id', id)
-    .eq('user_id', user.id)
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 404 })
