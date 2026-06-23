@@ -1,5 +1,8 @@
 'use client'
 
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+
 interface StreamingMessageProps {
   content: string
 }
@@ -34,10 +37,15 @@ export function StreamingMessage({ content }: StreamingMessageProps) {
           border: '1px solid var(--border)',
           fontSize: '0.875rem',
           lineHeight: 1.65,
-          whiteSpace: 'pre-wrap',
         }}
       >
-        {content || <span style={{ opacity: 0.4 }}>Thinking...</span>}
+        {content ? (
+          <div className="qa-markdown">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {content}
+            </ReactMarkdown>
+          </div>
+        ) : <span style={{ opacity: 0.4 }}>Thinking...</span>}
         <span
           style={{
             display: 'inline-block',

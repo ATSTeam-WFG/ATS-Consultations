@@ -516,6 +516,82 @@
 .tier-unicorn::before { color: #9333ea; }
 
 /* ============================================================
+   Q&A Markdown rendering
+   ============================================================ */
+.qa-markdown { display: block; }
+.qa-markdown p { margin: 0 0 0.625rem; }
+.qa-markdown p:last-child { margin-bottom: 0; }
+.qa-markdown h1, .qa-markdown h2, .qa-markdown h3,
+.qa-markdown h4, .qa-markdown h5, .qa-markdown h6 {
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0.875rem 0 0.375rem;
+}
+.qa-markdown h1 { font-size: 1.125rem; }
+.qa-markdown h2 { font-size: 1rem; }
+.qa-markdown h3 { font-size: 0.9375rem; }
+.qa-markdown h1:first-child,
+.qa-markdown h2:first-child,
+.qa-markdown h3:first-child { margin-top: 0; }
+.qa-markdown ul, .qa-markdown ol {
+  margin: 0.375rem 0 0.625rem;
+  padding-left: 1.25rem;
+}
+.qa-markdown li { margin-bottom: 0.25rem; }
+.qa-markdown strong { font-weight: 700; }
+.qa-markdown em { font-style: italic; }
+.qa-markdown code {
+  font-family: 'Menlo', 'Monaco', 'Consolas', monospace;
+  font-size: 0.8125rem;
+  background: rgba(99, 102, 241, 0.08);
+  color: var(--ats-indigo);
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.25rem;
+}
+.qa-markdown pre {
+  background: #1e1e2e;
+  color: #cdd6f4;
+  border-radius: 0.5rem;
+  padding: 0.875rem 1rem;
+  overflow-x: auto;
+  margin: 0.625rem 0;
+}
+.qa-markdown pre code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  font-size: 0.8125rem;
+}
+.qa-markdown blockquote {
+  border-left: 3px solid var(--ats-indigo);
+  padding-left: 0.75rem;
+  color: var(--ats-text-2);
+  margin: 0.5rem 0;
+}
+.qa-markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+  margin: 0.625rem 0;
+}
+.qa-markdown th {
+  background: var(--ats-bg);
+  font-weight: 600;
+  padding: 0.375rem 0.625rem;
+  border: 1px solid var(--ats-border);
+  text-align: left;
+}
+.qa-markdown td {
+  padding: 0.375rem 0.625rem;
+  border: 1px solid var(--ats-border);
+}
+.qa-markdown hr {
+  border: none;
+  border-top: 1px solid var(--ats-border);
+  margin: 0.75rem 0;
+}
+
+/* ============================================================
    Loading
    ============================================================ */
 .spinner {

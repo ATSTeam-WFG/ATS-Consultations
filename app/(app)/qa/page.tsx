@@ -175,11 +175,15 @@ export default function QAPage() {
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div
           style={{
-            padding: '1rem 1.25rem',
+            height: '3.5rem',
+            display: 'flex',
+            alignItems: 'center',
+            padding: '0 1.25rem',
             borderBottom: '1px solid var(--border)',
             background: 'var(--card)',
             fontWeight: 600,
             fontSize: '0.9375rem',
+            flexShrink: 0,
           }}
         >
           {conversations.find((c) => c.id === activeConversationId)?.title ?? 'Ask'}

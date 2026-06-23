@@ -29,7 +29,7 @@ export function ConversationSidebar({
         background: 'var(--card)',
       }}
     >
-      <div style={{ padding: '0.875rem', borderBottom: '1px solid var(--border)' }}>
+      <div style={{ height: '3.5rem', display: 'flex', alignItems: 'center', padding: '0 0.875rem', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
         <button
           onClick={onNew}
           disabled={loading}

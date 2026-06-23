@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import type { QAMessage, ContextUsed } from '@/lib/types'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 
@@ -52,10 +54,15 @@ export function MessageBubble({ message }: MessageBubbleProps) {
             border: isUser ? 'none' : '1px solid var(--border)',
             fontSize: '0.875rem',
             lineHeight: 1.65,
-            whiteSpace: 'pre-wrap',
           }}
         >
-          {message.content}
+          {isUser ? message.content : (
+            <div className="qa-markdown">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {message.content}
+              </ReactMarkdown>
+            </div>
+          )}
         </div>
 
         {!isUser && sources && sources.length > 0 && (
