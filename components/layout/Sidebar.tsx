@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useState, useEffect } from 'react'
 import {
   LayoutDashboard,
   Users,
@@ -14,6 +15,14 @@ import {
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase-client'
 import { useRouter } from 'next/navigation'
+
+const USER_NAMES: Record<string, string> = {
+  'vupganlawar@wfgtitle.com': 'Vedant Upganlawar',
+  'atatke@wfgtitle.com': 'Anish Tatke',
+  'pkatudia@wfgtitle.com': 'Priyal Katudia',
+  'acaruthers@wfgtitle.com': 'Alex Caruthers',
+  'rozonian@wfgtitle.com': 'Ryan Ozonian',
+}
 
 const NAV = [
   {
@@ -48,6 +57,14 @@ const NAV = [
 export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
+  const [name, setName] = useState('')
+
+  useEffect(() => {
+    createClient().auth.getUser().then(({ data }) => {
+      const email = data.user?.email?.toLowerCase() ?? ''
+      setName(USER_NAMES[email] ?? email.split('@')[0])
+    })
+  }, [])
 
   async function handleSignOut() {
     const supabase = createClient()
@@ -90,10 +107,22 @@ export function Sidebar() {
       </nav>
 
       <div className="sidebar-footer">
+        {name && (
+          <div style={{
+            padding: '0.75rem 0.75rem 0.5rem',
+            fontSize: '0.8rem',
+            fontWeight: 700,
+            color: '#6366f1',
+            borderTop: '1px solid var(--border)',
+            marginBottom: '0.25rem',
+          }}>
+            {name}
+          </div>
+        )}
         <button
           onClick={handleSignOut}
           className="sidebar-nav-item"
-          style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer' }}
+          style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', opacity: 0.45, fontSize: '0.75rem' }}
         >
           <LogOut size={16} />
           Sign out
