@@ -40,7 +40,7 @@ export default async function AgentsPage() {
           }}
         >
           <Plus size={16} />
-          New Title Agent
+          <span className="page-header-action-label">New Title Agent</span>
         </Link>
       </div>
 
@@ -68,83 +68,101 @@ export default async function AgentsPage() {
             </div>
           </div>
         ) : (
-          <div className="ats-card" style={{ padding: 0, overflow: 'hidden' }}>
-            <table className="ats-table">
-              <thead>
-                <tr>
-                  <th>Agency Name</th>
-                  <th>Category</th>
-                  <th>WFG Rep</th>
-                  <th>Contacts</th>
-                  <th>Sessions</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {agents.map((agent: {
-                  id: string
-                  name: string
-                  agency_name?: string
-                  category?: TitleAgentCategory | null
-                  wfg_rep?: string | null
-                  contacts?: unknown[]
-                  sessions?: { count: number }[]
-                }) => (
-                  <tr key={agent.id}>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-                        <div
-                          style={{
-                            width: '1.875rem',
-                            height: '1.875rem',
-                            borderRadius: '50%',
-                            background: 'var(--ats-blue-light)',
-                            color: 'var(--ats-blue-dark)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontWeight: 700,
-                            fontSize: '0.75rem',
-                            flexShrink: 0,
-                          }}
-                        >
-                          {agent.name.charAt(0).toUpperCase()}
-                        </div>
-                        <Link
-                          href={`/agents/${agent.id}`}
-                          style={{ fontWeight: 500, textDecoration: 'none', color: 'var(--foreground)' }}
-                        >
-                          {agent.name}
-                        </Link>
-                      </div>
-                    </td>
-                    <td>
-                      {agent.category ? (
-                        <span className={`tier-mark ${CATEGORY_TIER[agent.category]}`}>
-                          {agent.category}
-                        </span>
-                      ) : <span style={{ color: 'var(--ats-text-3)' }}>—</span>}
-                    </td>
-                    <td style={{ color: 'var(--muted-foreground)' }}>{agent.wfg_rep ?? '—'}</td>
-                    <td style={{ color: 'var(--muted-foreground)' }}>
-                      {agent.contacts?.length ?? 0}
-                    </td>
-                    <td style={{ fontWeight: 600, color: 'var(--ats-text)' }}>
-                      {(agent.sessions as unknown as { count: number }[])?.[0]?.count ?? 0}
-                    </td>
-                    <td>
-                      <Link
-                        href={`/agents/${agent.id}`}
-                        style={{ fontSize: '0.8125rem', color: 'var(--ats-blue)', textDecoration: 'none' }}
-                      >
-                        View
-                      </Link>
-                    </td>
+          <>
+            {/* Desktop table */}
+            <div className="agents-desktop ats-card" style={{ padding: 0, overflow: 'hidden' }}>
+              <div className="table-scroll">
+              <table className="ats-table">
+                <thead>
+                  <tr>
+                    <th>Agency Name</th>
+                    <th>Category</th>
+                    <th>WFG Rep</th>
+                    <th>Contacts</th>
+                    <th>Sessions</th>
+                    <th></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {agents.map((agent: {
+                    id: string
+                    name: string
+                    agency_name?: string
+                    category?: TitleAgentCategory | null
+                    wfg_rep?: string | null
+                    contacts?: unknown[]
+                    sessions?: { count: number }[]
+                  }) => (
+                    <tr key={agent.id}>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+                          <div style={{ width: '1.875rem', height: '1.875rem', borderRadius: '50%', background: 'var(--ats-blue-light)', color: 'var(--ats-blue-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.75rem', flexShrink: 0 }}>
+                            {agent.name.charAt(0).toUpperCase()}
+                          </div>
+                          <Link href={`/agents/${agent.id}`} style={{ fontWeight: 500, textDecoration: 'none', color: 'var(--foreground)' }}>
+                            {agent.name}
+                          </Link>
+                        </div>
+                      </td>
+                      <td>
+                        {agent.category
+                          ? <span className={`tier-mark ${CATEGORY_TIER[agent.category]}`}>{agent.category}</span>
+                          : <span style={{ color: 'var(--ats-text-3)' }}>—</span>}
+                      </td>
+                      <td style={{ color: 'var(--muted-foreground)' }}>{agent.wfg_rep ?? '—'}</td>
+                      <td style={{ color: 'var(--muted-foreground)' }}>{agent.contacts?.length ?? 0}</td>
+                      <td style={{ fontWeight: 600, color: 'var(--ats-text)' }}>
+                        {(agent.sessions as unknown as { count: number }[])?.[0]?.count ?? 0}
+                      </td>
+                      <td>
+                        <Link href={`/agents/${agent.id}`} style={{ fontSize: '0.8125rem', color: 'var(--ats-blue)', textDecoration: 'none' }}>View</Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              </div>
+            </div>
+
+            {/* Mobile card list */}
+            <div className="agents-mobile">
+              {agents.map((agent: {
+                id: string
+                name: string
+                agency_name?: string
+                category?: TitleAgentCategory | null
+                wfg_rep?: string | null
+                contacts?: unknown[]
+                sessions?: { count: number }[]
+              }) => {
+                const sessionCount = (agent.sessions as unknown as { count: number }[])?.[0]?.count ?? 0
+                return (
+                  <Link key={agent.id} href={`/agents/${agent.id}`} className="agent-card-row">
+                    <div className="agent-card-row__avatar">
+                      {agent.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="agent-card-row__body">
+                      <div className="agent-card-row__name">{agent.name}</div>
+                      {agent.agency_name && (
+                        <div className="agent-card-row__agency">{agent.agency_name}</div>
+                      )}
+                      <div className="agent-card-row__meta">
+                        {agent.category && (
+                          <span className={`tier-mark ${CATEGORY_TIER[agent.category]}`} style={{ fontSize: '0.75rem' }}>
+                            {agent.category}
+                          </span>
+                        )}
+                        <span className="agent-card-row__sessions">
+                          {sessionCount} session{sessionCount !== 1 ? 's' : ''}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="agent-card-row__arrow">›</div>
+                  </Link>
+                )
+              })}
+            </div>
+          </>
         )}
       </div>
     </>

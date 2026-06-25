@@ -2,7 +2,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supabase'
 import { Pencil, CalendarDays } from 'lucide-react'
-import type { Session, TitleAgentCategory, Contact } from '@/lib/types'
+import { AgentPlaybooks } from '@/components/agents/AgentPlaybooks'
+import type { Session, TitleAgentCategory, Contact, AgentPlaybook, Playbook } from '@/lib/types'
 
 const CATEGORY_BADGE: Record<TitleAgentCategory, string> = {
   UNICORN: 'badge-unicorn',
@@ -32,18 +33,23 @@ export default async function AgentDetailPage({
   const sessions: Session[] = agent.sessions ?? []
   const contacts: Contact[] = agent.contacts ?? []
 
+  const [{ data: bookmarkedPlaybooks }, { data: allPlaybooks }] = await Promise.all([
+    db.from('agent_playbooks').select('*, playbook:playbooks(*)').eq('agent_id', id).order('created_at', { ascending: false }),
+    db.from('playbooks').select('*').eq('status', 'published').order('title'),
+  ])
+
   return (
     <>
       <div className="page-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 0 }}>
           <Link
             href="/agents"
-            style={{ fontSize: '0.875rem', color: 'var(--muted-foreground)', textDecoration: 'none' }}
+            style={{ fontSize: '0.875rem', color: 'var(--muted-foreground)', textDecoration: 'none', flexShrink: 0 }}
           >
-            Title Agents
+            Agents
           </Link>
-          <span style={{ color: 'var(--muted-foreground)' }}>/</span>
-          <h1 className="page-title">{agent.name}</h1>
+          <span style={{ color: 'var(--muted-foreground)', flexShrink: 0 }}>/</span>
+          <h1 className="page-title" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{agent.name}</h1>
         </div>
         <Link
           href={`/agents/${id}/edit`}
@@ -67,7 +73,7 @@ export default async function AgentDetailPage({
 
       <div className="page-body" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         {/* Profile card */}
-        <div className="ats-card" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
+        <div className="ats-card profile-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
           <div>
             <div style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)', marginBottom: '0.25rem' }}>Agency</div>
             <div style={{ fontWeight: 500 }}>{agent.agency_name}</div>
@@ -157,6 +163,7 @@ export default async function AgentDetailPage({
             </div>
           ) : (
             <div className="ats-card" style={{ padding: 0, overflow: 'hidden' }}>
+              <div className="table-scroll">
               <table className="ats-table">
                 <thead>
                   <tr>
@@ -200,9 +207,16 @@ export default async function AgentDetailPage({
                   ))}
                 </tbody>
               </table>
+              </div>
             </div>
           )}
         </div>
+        {/* Playbook bookmarks */}
+        <AgentPlaybooks
+          agentId={id}
+          initialPlaybooks={(bookmarkedPlaybooks ?? []) as AgentPlaybook[]}
+          allPlaybooks={(allPlaybooks ?? []) as Playbook[]}
+        />
       </div>
     </>
   )

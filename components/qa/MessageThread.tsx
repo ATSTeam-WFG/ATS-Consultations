@@ -13,61 +13,39 @@ interface MessageThreadProps {
 
 export function MessageThread({ messages, streamingContent, loading }: MessageThreadProps) {
   const bottomRef = useRef<HTMLDivElement>(null)
+  const prevLengthRef = useRef(0)
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages, streamingContent])
+    const prev = prevLengthRef.current
+    const next = messages.length
+    prevLengthRef.current = next
+    // Conversation switch (many msgs at once) → instant jump to bottom
+    // New single message added → smooth scroll
+    const behavior: ScrollBehavior = next - prev > 1 ? 'instant' : 'smooth'
+    bottomRef.current?.scrollIntoView({ behavior })
+  }, [messages])
+
+  useEffect(() => {
+    if (streamingContent !== null) {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [streamingContent])
 
   if (messages.length === 0 && !loading) {
     return (
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '2rem',
-          color: 'var(--muted-foreground)',
-          gap: '0.75rem',
-          textAlign: 'center',
-        }}
-      >
-        <div style={{ fontSize: '2rem' }}>💬</div>
-        <div style={{ fontWeight: 600, color: 'var(--foreground)' }}>Ask anything about your data</div>
-        <p style={{ fontSize: '0.875rem', maxWidth: '420px' }}>
-          Ask about agent performance, recurring problems, which playbooks to use, trends across sessions, and more.
+      <div className="qa-empty-state">
+        <div className="qa-empty-state__icon">💬</div>
+        <div className="qa-empty-state__title">Ask anything about your data</div>
+        <p className="qa-empty-state__sub">
+          Agent performance, recurring problems, playbook suggestions, trends.
         </p>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.5rem',
-            marginTop: '0.5rem',
-            alignItems: 'flex-start',
-            width: '100%',
-            maxWidth: '420px',
-          }}
-        >
+        <div className="qa-empty-state__examples">
           {[
             'What are the most common problems across all sessions?',
             'Which agents are struggling with pipeline velocity?',
             'What playbook should I use for sourcing issues?',
           ].map((example) => (
-            <div
-              key={example}
-              style={{
-                padding: '0.5rem 0.875rem',
-                border: '1px solid var(--border)',
-                borderRadius: '0.5rem',
-                fontSize: '0.8125rem',
-                color: 'var(--muted-foreground)',
-                background: 'var(--card)',
-                cursor: 'default',
-              }}
-            >
-              {example}
-            </div>
+            <div key={example} className="qa-empty-state__chip">{example}</div>
           ))}
         </div>
       </div>
@@ -83,6 +61,7 @@ export function MessageThread({ messages, streamingContent, loading }: MessageTh
         display: 'flex',
         flexDirection: 'column',
         gap: '1.25rem',
+        minHeight: 0,
       }}
     >
       {messages.map((msg) => (

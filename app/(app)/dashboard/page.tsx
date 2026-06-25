@@ -46,7 +46,7 @@ export default async function DashboardPage() {
 
       <div className="page-body" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         {/* Metric cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
+        <div className="mob-grid-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
           <MetricCard label="Agents" value={totalAgents ?? 0} />
           <MetricCard label="Sessions" value={totalSessions ?? 0} />
           <MetricCard label="Processed" value={processedSessions ?? 0} accent />
@@ -54,13 +54,13 @@ export default async function DashboardPage() {
         </div>
 
         {/* Charts row */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+        <div className="mob-grid-1" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
           <TopProblemsChart data={topProblems} />
           <TrendAlerts trends={(trends as Trend[]) ?? []} />
         </div>
 
         {/* Bottom row */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+        <div className="mob-grid-1" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
           <TopPlaybooks playbooks={topPlaybooks ?? []} />
         </div>
       </div>

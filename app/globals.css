@@ -277,6 +277,15 @@
   background: var(--ats-bg);
 }
 
+/* Wraps main-content + BottomNav so they form a flex column */
+.main-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-width: 0;
+}
+
 .main-content {
   margin-left: 248px;
   flex: 1;
@@ -284,6 +293,7 @@
   flex-direction: column;
   min-height: 100vh;
   background: var(--ats-bg);
+  min-width: 0;
 }
 
 .page-header {
@@ -592,6 +602,206 @@
 }
 
 /* ============================================================
+   QA empty state
+   ============================================================ */
+.qa-empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  gap: 0.75rem;
+  text-align: center;
+  min-height: 0;
+  overflow-y: auto;
+}
+.qa-empty-state__icon  { font-size: 2rem; line-height: 1; }
+.qa-empty-state__title { font-weight: 600; color: var(--foreground); font-size: 1rem; }
+.qa-empty-state__sub   { font-size: 0.875rem; color: var(--muted-foreground); max-width: 380px; margin: 0; }
+.qa-empty-state__examples {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  width: 100%;
+  max-width: 420px;
+}
+.qa-empty-state__chip {
+  padding: 0.5rem 0.875rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+  background: var(--card);
+  text-align: left;
+}
+
+/* ============================================================
+   Agents — responsive list
+   ============================================================ */
+.agents-mobile { display: none; }
+
+.agent-card-row {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.875rem 1rem;
+  background: var(--ats-surface);
+  border-bottom: 1px solid var(--ats-border);
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.12s;
+}
+.agent-card-row:first-child { border-radius: 0.75rem 0.75rem 0 0; }
+.agent-card-row:last-child  { border-radius: 0 0 0.75rem 0.75rem; border-bottom: none; }
+.agent-card-row:only-child  { border-radius: 0.75rem; }
+.agent-card-row:active      { background: var(--ats-indigo-light); }
+
+.agent-card-row__avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: var(--ats-indigo-light);
+  color: var(--ats-indigo-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  flex-shrink: 0;
+}
+.agent-card-row__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.agent-card-row__name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--ats-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.agent-card-row__agency {
+  font-size: 0.75rem;
+  color: var(--ats-text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.agent-card-row__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-top: 0.25rem;
+}
+.agent-card-row__sessions {
+  font-size: 0.75rem;
+  color: var(--ats-text-3);
+}
+.agent-card-row__arrow {
+  flex-shrink: 0;
+  font-size: 1.25rem;
+  color: var(--ats-text-3);
+  line-height: 1;
+}
+
+/* ============================================================
+   Sessions — responsive list
+   ============================================================ */
+.sessions-mobile { display: none; }
+
+.session-card-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  padding: 0.875rem 1rem;
+  background: var(--ats-surface);
+  border-bottom: 1px solid var(--ats-border);
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.12s;
+}
+.session-card-row:first-child { border-radius: 0.75rem 0.75rem 0 0; }
+.session-card-row:last-child  { border-radius: 0 0 0.75rem 0.75rem; border-bottom: none; }
+.session-card-row:only-child  { border-radius: 0.75rem; }
+.session-card-row:active { background: var(--ats-indigo-light); }
+
+.session-card-row__left {
+  flex-shrink: 0;
+  width: 2.75rem;
+  text-align: center;
+  padding-top: 0.125rem;
+}
+.session-card-row__date {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ats-indigo);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+}
+.session-card-row__year {
+  font-size: 0.625rem;
+  color: var(--ats-text-3);
+  margin-top: 0.1rem;
+}
+
+.session-card-row__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.session-card-row__agent {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--ats-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.session-card-row__agency {
+  font-size: 0.75rem;
+  color: var(--ats-text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.session-card-row__summary {
+  font-size: 0.8125rem;
+  color: var(--ats-text-2);
+  margin-top: 0.25rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.session-card-row__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.375rem;
+}
+.session-card-row__duration {
+  font-size: 0.75rem;
+  color: var(--ats-text-3);
+}
+
+.session-card-row__arrow {
+  flex-shrink: 0;
+  font-size: 1.25rem;
+  color: var(--ats-text-3);
+  line-height: 1;
+  padding-top: 0.125rem;
+}
+
+/* ============================================================
    Loading
    ============================================================ */
 .spinner {
@@ -604,6 +814,189 @@
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============================================================
+   Mobile responsive utilities
+   ============================================================ */
+
+/* Grid utilities that collapse on mobile */
+.mob-grid-2 { display: grid; }
+.mob-grid-1 { display: grid; }
+
+/* Bottom nav — hidden on desktop */
+.bottom-nav { display: none; }
+
+@media (max-width: 767px) {
+  /* ── Core layout: html/body/app-shell fill viewport height,
+        main-content scrolls inside, bottom nav is a flex child
+        so it's ALWAYS visible without any scrolling ── */
+  html, body { height: 100%; overflow: hidden; }
+
+  .app-shell {
+    height: 100%;
+    min-height: unset;
+    overflow: hidden;
+  }
+
+  .main-wrapper {
+    height: 100%;
+    min-height: unset;
+    overflow: hidden;
+  }
+
+  .sidebar { display: none; }
+
+  .main-content {
+    margin-left: 0;
+    min-height: unset;
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0; /* no extra padding — nav is in flow */
+  }
+
+  /* QA full-height shell fills its flex parent */
+  .qa-shell { height: 100% !important; }
+
+  /* Page structure */
+  .page-header {
+    padding: 0.75rem 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    min-height: unset;
+  }
+  .page-header .page-title { font-size: 0.9375rem; }
+  .page-body { padding: 0.875rem 1rem; }
+
+  /* Table scroll on mobile */
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* Grid collapses */
+  .profile-grid { grid-template-columns: 1fr !important; }
+  .mob-grid-2 { grid-template-columns: repeat(2, 1fr) !important; }
+  .mob-grid-1 { grid-template-columns: 1fr !important; }
+
+  /* Cards */
+  .ats-card { padding: 1rem; }
+  .metric-card { padding: 0.875rem 1rem !important; }
+  .metric-card .section-label { font-size: 0.625rem; margin-bottom: 0.375rem; }
+
+  /* Page header actions — icon-only on small screens */
+  .page-header-action-label { display: none; }
+
+  /* Sessions: swap table → cards on mobile */
+  .sessions-desktop { display: none; }
+  .sessions-mobile {
+    display: block;
+    border: 1px solid var(--ats-border);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  /* Agents: swap table → cards on mobile */
+  .agents-desktop { display: none; }
+  .agents-mobile {
+    display: block;
+    border: 1px solid var(--ats-border);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  /* QA: fix height chain so ChatInput + empty state are always visible.
+     .main-content scrolls normally for all pages, but for QA the shell
+     itself needs to fill the container — use :has() to target only QA. */
+  .main-content:has(.qa-shell) {
+    overflow: hidden;
+    flex: 1;
+    min-height: 0;
+  }
+  .qa-shell {
+    height: 100% !important;
+    min-height: unset !important;
+  }
+
+  /* QA empty state: tighter on small screens */
+  .qa-empty-state {
+    padding: 1.25rem 1rem;
+    justify-content: flex-start;
+    padding-top: 1.5rem;
+  }
+  .qa-empty-state__icon  { font-size: 1.5rem; }
+  .qa-empty-state__title { font-size: 0.9375rem; }
+  .qa-empty-state__sub   { font-size: 0.8125rem; }
+  .qa-empty-state__chip  { font-size: 0.75rem; padding: 0.4rem 0.75rem; }
+
+  /* QA: slide-in conversation sidebar */
+  .qa-conv-sidebar {
+    position: fixed !important;
+    top: 0;
+    left: -260px;
+    width: 260px !important;
+    height: calc(100% - 68px);
+    z-index: 46;
+    transition: left 0.25s ease;
+    box-shadow: none;
+  }
+  .qa-conv-sidebar--open {
+    left: 0 !important;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+  }
+  .qa-mobile-overlay { display: block !important; }
+  .qa-conv-toggle { display: flex !important; }
+
+  /* ── Bottom nav: flex child, NOT position:fixed ──
+        Sits at bottom of .main-wrapper naturally.
+        Avoids iOS Safari fixed-position scroll bug. */
+  .bottom-nav {
+    display: flex;
+    flex-shrink: 0;
+    width: 100%;
+    height: 68px;
+    background: var(--ats-sidebar-bg);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    z-index: 40;
+    align-items: stretch;
+    padding: 0 0.25rem;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .bottom-nav-tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(156, 163, 184, 0.6);
+    text-decoration: none;
+    transition: color 0.15s;
+    padding: 0.5rem 0.25rem;
+    border-radius: 0.5rem;
+    position: relative;
+    min-height: 44px;
+  }
+
+  .bottom-nav-tab:hover { color: var(--ats-sidebar-active); }
+
+  .bottom-nav-tab.active { color: var(--ats-indigo); }
+
+  .bottom-nav-tab.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20%;
+    right: 20%;
+    height: 2px;
+    background: var(--ats-indigo);
+    border-radius: 0 0 2px 2px;
+  }
+}
 
 /* ============================================================
    Empty state

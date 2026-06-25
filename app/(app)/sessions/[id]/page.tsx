@@ -48,21 +48,21 @@ export default async function SessionDetailPage({
   return (
     <>
       <div className="page-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <Link href="/sessions" style={{ fontSize: '0.875rem', color: 'var(--muted-foreground)', textDecoration: 'none' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 0 }}>
+          <Link href="/sessions" style={{ fontSize: '0.875rem', color: 'var(--muted-foreground)', textDecoration: 'none', flexShrink: 0 }}>
             Sessions
           </Link>
-          <span style={{ color: 'var(--muted-foreground)' }}>/</span>
-          <h1 className="page-title">
+          <span style={{ color: 'var(--muted-foreground)', flexShrink: 0 }}>/</span>
+          <h1 className="page-title" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {new Date(session.session_date).toLocaleDateString()} — {agent?.name ?? 'Session'}
           </h1>
         </div>
-        <span className={`badge badge-${session.status}`}>{session.status}</span>
+        <span className={`badge badge-${session.status}`} style={{ flexShrink: 0 }}>{session.status}</span>
       </div>
 
       <div className="page-body" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         {/* Meta */}
-        <div className="ats-card" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.25rem' }}>
+        <div className="ats-card mob-grid-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.25rem' }}>
           <div>
             <div style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)', marginBottom: '0.25rem' }}>Title Agent</div>
             <div style={{ fontWeight: 500 }}>

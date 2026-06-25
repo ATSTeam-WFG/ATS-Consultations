@@ -8,9 +8,10 @@ interface MetricCardProps {
 export function MetricCard({ label, value, sub, accent }: MetricCardProps) {
   return (
     <div
+      className="metric-card"
       style={{
         background: 'var(--ats-surface)',
-        border: accent ? '1px solid var(--ats-border)' : '1px solid var(--ats-border)',
+        border: '1px solid var(--ats-border)',
         borderRadius: '0.75rem',
         padding: '1.25rem 1.5rem',
         boxShadow: '0 1px 3px rgba(0,0,0,0.06)',

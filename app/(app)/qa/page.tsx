@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { MessagesSquare, X } from 'lucide-react'
 import type { QAConversation, QAMessage } from '@/lib/types'
 import { ConversationSidebar } from '@/components/qa/ConversationSidebar'
 import { MessageThread } from '@/components/qa/MessageThread'
@@ -13,6 +14,7 @@ export default function QAPage() {
   const [streamingContent, setStreamingContent] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [initLoading, setInitLoading] = useState(true)
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
   useEffect(() => {
     loadConversations()
@@ -156,37 +158,74 @@ export default function QAPage() {
 
   if (initLoading) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+      <div className="qa-shell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', minHeight: '100vh' }}>
         <div className="spinner" />
       </div>
     )
   }
 
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-      <ConversationSidebar
-        conversations={conversations}
-        activeId={activeConversationId}
-        onSelect={selectConversation}
-        onNew={createConversation}
-        loading={loading}
-      />
+    <div className="qa-shell" style={{ display: 'flex', height: '100%', minHeight: '100vh', overflow: 'hidden', position: 'relative' }}>
+      {/* Mobile sidebar overlay */}
+      {mobileSidebarOpen && (
+        <div
+          onClick={() => setMobileSidebarOpen(false)}
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)',
+            zIndex: 45, display: 'none',
+          }}
+          className="qa-mobile-overlay"
+        />
+      )}
 
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      {/* Conversation sidebar — hidden on mobile unless open */}
+      <div className={`qa-conv-sidebar${mobileSidebarOpen ? ' qa-conv-sidebar--open' : ''}`}>
+        <ConversationSidebar
+          conversations={conversations}
+          activeId={activeConversationId}
+          onSelect={(id) => { selectConversation(id); setMobileSidebarOpen(false) }}
+          onNew={() => { createConversation(); setMobileSidebarOpen(false) }}
+          loading={loading}
+        />
+      </div>
+
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
         <div
           style={{
             height: '3.5rem',
             display: 'flex',
             alignItems: 'center',
-            padding: '0 1.25rem',
+            padding: '0 1rem',
             borderBottom: '1px solid var(--border)',
             background: 'var(--card)',
-            fontWeight: 600,
-            fontSize: '0.9375rem',
             flexShrink: 0,
+            gap: '0.75rem',
           }}
         >
-          {conversations.find((c) => c.id === activeConversationId)?.title ?? 'Ask'}
+          {/* Mobile chats toggle — only visible on mobile */}
+          <button
+            className="qa-conv-toggle"
+            onClick={() => setMobileSidebarOpen((v) => !v)}
+            style={{
+              display: 'none',
+              alignItems: 'center',
+              gap: '0.375rem',
+              padding: '0.375rem 0.625rem',
+              border: '1px solid var(--border)',
+              borderRadius: '0.375rem',
+              background: 'none',
+              cursor: 'pointer',
+              fontSize: '0.8125rem',
+              fontWeight: 500,
+              flexShrink: 0,
+            }}
+            aria-label="Toggle conversations"
+          >
+            {mobileSidebarOpen ? <X size={16} /> : <MessagesSquare size={16} />}
+          </button>
+          <span style={{ fontWeight: 600, fontSize: '0.9375rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {conversations.find((c) => c.id === activeConversationId)?.title ?? 'Ask'}
+          </span>
         </div>
 
         <MessageThread

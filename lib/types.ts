@@ -205,6 +205,15 @@ export interface PlaybookMatch {
   match_reason: string
 }
 
+export interface AgentPlaybook {
+  id: string
+  agent_id: string
+  playbook_id: string
+  added_by: string | null
+  created_at: string
+  playbook?: Playbook
+}
+
 // ============================================================
 // Q&A
 // ============================================================

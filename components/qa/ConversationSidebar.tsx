@@ -27,6 +27,7 @@ export function ConversationSidebar({
         display: 'flex',
         flexDirection: 'column',
         background: 'var(--card)',
+        height: '100%',
       }}
     >
       <div style={{ height: '3.5rem', display: 'flex', alignItems: 'center', padding: '0 0.875rem', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>

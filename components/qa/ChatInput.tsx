@@ -42,6 +42,7 @@ export function ChatInput({ onSubmit, loading }: ChatInputProps) {
         padding: '1rem',
         borderTop: '1px solid var(--border)',
         background: 'var(--card)',
+        flexShrink: 0,
       }}
     >
       <div

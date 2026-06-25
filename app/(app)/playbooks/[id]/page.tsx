@@ -1,8 +1,15 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supabase'
-import { Pencil, Clock, BarChart3, CheckCircle2 } from 'lucide-react'
-import type { Playbook, PlaybookStep } from '@/lib/types'
+import { Pencil, Clock, BarChart3, CheckCircle2, Users } from 'lucide-react'
+import type { Playbook, PlaybookStep, TitleAgentCategory } from '@/lib/types'
+
+const CATEGORY_BADGE: Record<TitleAgentCategory, string> = {
+  UNICORN: 'badge-unicorn',
+  DIAMOND: 'badge-diamond',
+  GOLD: 'badge-gold',
+  SILVER: 'badge-silver',
+}
 
 export default async function PlaybookDetailPage({
   params,
@@ -14,11 +21,13 @@ export default async function PlaybookDetailPage({
   const { data: { user } } = await supabase.auth.getUser()
 
   const db = createServiceRoleClient()
-  const { data: playbook, error } = await db
-    .from('playbooks')
-    .select('*')
-    .eq('id', id)
-    .single()
+  const [{ data: playbook, error }, { data: associatedAgents }] = await Promise.all([
+    db.from('playbooks').select('*').eq('id', id).single(),
+    db.from('agent_playbooks')
+      .select('*, agent:agents(id, name, agency_name, category)')
+      .eq('playbook_id', id)
+      .order('created_at', { ascending: false }),
+  ])
 
   if (error || !playbook) notFound()
 
@@ -27,12 +36,12 @@ export default async function PlaybookDetailPage({
   return (
     <>
       <div className="page-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <Link href="/playbooks" style={{ fontSize: '0.875rem', color: 'var(--muted-foreground)', textDecoration: 'none' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 0 }}>
+          <Link href="/playbooks" style={{ fontSize: '0.875rem', color: 'var(--muted-foreground)', textDecoration: 'none', flexShrink: 0 }}>
             Playbooks
           </Link>
-          <span style={{ color: 'var(--muted-foreground)' }}>/</span>
-          <h1 className="page-title">{pb.title}</h1>
+          <span style={{ color: 'var(--muted-foreground)', flexShrink: 0 }}>/</span>
+          <h1 className="page-title" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{pb.title}</h1>
         </div>
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
           <span className={`badge badge-${pb.status}`}>{pb.status}</span>
@@ -152,6 +161,49 @@ export default async function PlaybookDetailPage({
             </div>
           </div>
         )}
+
+        {/* Associated agents */}
+        <div className="ats-card">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.875rem' }}>
+            <Users size={16} style={{ color: 'var(--ats-indigo)' }} />
+            <div style={{ fontSize: '0.875rem', fontWeight: 600 }}>
+              Associated Agents ({(associatedAgents ?? []).length})
+            </div>
+          </div>
+          {!associatedAgents || associatedAgents.length === 0 ? (
+            <p style={{ fontSize: '0.875rem', color: 'var(--ats-text-3)' }}>
+              No agents associated yet. Bookmark this playbook from an agent detail page.
+            </p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {(associatedAgents as unknown as {
+                agent: { id: string; name: string; agency_name?: string; category?: TitleAgentCategory | null }
+              }[]).map(({ agent }) => (
+                <div
+                  key={agent.id}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', padding: '0.5rem 0', borderBottom: '1px solid var(--ats-border)' }}
+                >
+                  <div>
+                    <Link
+                      href={`/agents/${agent.id}`}
+                      style={{ fontWeight: 500, fontSize: '0.875rem', textDecoration: 'none', color: 'var(--ats-text)' }}
+                    >
+                      {agent.name}
+                    </Link>
+                    {agent.agency_name && (
+                      <div style={{ fontSize: '0.75rem', color: 'var(--ats-text-3)' }}>{agent.agency_name}</div>
+                    )}
+                  </div>
+                  {agent.category && (
+                    <span className={`badge ${CATEGORY_BADGE[agent.category]}`} style={{ flexShrink: 0 }}>
+                      {agent.category}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </>
   )

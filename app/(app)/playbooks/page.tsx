@@ -34,7 +34,7 @@ export default async function PlaybooksPage() {
           }}
         >
           <Plus size={16} />
-          New playbook
+          <span className="page-header-action-label">New playbook</span>
         </Link>
       </div>
 
