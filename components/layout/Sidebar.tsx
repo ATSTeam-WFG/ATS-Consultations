@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Users,
   CalendarDays,
+  Calendar,
   BookOpen,
   TrendingUp,
   Wrench,
@@ -36,6 +37,7 @@ const NAV = [
     items: [
       { href: '/agents', label: 'Agents', icon: Users },
       { href: '/sessions', label: 'Sessions', icon: CalendarDays },
+      { href: '/calendar', label: 'Calendar', icon: Calendar },
     ],
   },
   {

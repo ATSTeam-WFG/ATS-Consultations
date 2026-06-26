@@ -5,7 +5,7 @@
 export type ATSSize = 'small' | 'mid' | 'large' | 'enterprise'
 export type Difficulty = 'easy' | 'medium' | 'hard'
 export type TrendDirection = 'rising' | 'stable' | 'falling'
-export type SessionStatus = 'pending' | 'processing' | 'processed' | 'failed'
+export type SessionStatus = 'scheduled' | 'pending' | 'processing' | 'processed' | 'failed'
 export type SessionType = 'walk_in' | 'zoom_call'
 export type PlaybookStatus = 'draft' | 'published' | 'archived'
 export type MessageRole = 'user' | 'assistant'

@@ -9,9 +9,45 @@ interface MessageThreadProps {
   messages: QAMessage[]
   streamingContent: string | null
   loading: boolean
+  onExampleClick?: (text: string) => void
 }
 
-export function MessageThread({ messages, streamingContent, loading }: MessageThreadProps) {
+const EXAMPLE_CATEGORIES = [
+  {
+    icon: '📊',
+    label: 'Your Data',
+    examples: [
+      'Which agents have the most recurring problems?',
+      "What are the top pain points across all my sessions?",
+    ],
+  },
+  {
+    icon: '🏢',
+    label: 'Operations',
+    examples: [
+      'What are best practices for wire fraud prevention?',
+      'Walk me through TRID compliance requirements',
+    ],
+  },
+  {
+    icon: '⚙️',
+    label: 'Tech & Tools',
+    examples: [
+      'Best TPS for a mid-size title agency?',
+      'What automation wins should I prioritize first?',
+    ],
+  },
+  {
+    icon: '📈',
+    label: 'Strategy',
+    examples: [
+      'How do I pitch tech adoption to a resistant agent?',
+      'How should I grow realtor relationships for an agent?',
+    ],
+  },
+]
+
+export function MessageThread({ messages, streamingContent, loading, onExampleClick }: MessageThreadProps) {
   const bottomRef = useRef<HTMLDivElement>(null)
   const prevLengthRef = useRef(0)
 
@@ -35,17 +71,42 @@ export function MessageThread({ messages, streamingContent, loading }: MessageTh
     return (
       <div className="qa-empty-state">
         <div className="qa-empty-state__icon">💬</div>
-        <div className="qa-empty-state__title">Ask anything about your data</div>
+        <div className="qa-empty-state__title">Your title industry expert is ready</div>
         <p className="qa-empty-state__sub">
-          Agent performance, recurring problems, playbook suggestions, trends.
+          Ask about your agents, industry operations, technology, or growth strategy.
         </p>
-        <div className="qa-empty-state__examples">
-          {[
-            'What are the most common problems across all sessions?',
-            'Which agents are struggling with pipeline velocity?',
-            'What playbook should I use for sourcing issues?',
-          ].map((example) => (
-            <div key={example} className="qa-empty-state__chip">{example}</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem', width: '100%', maxWidth: '560px' }}>
+          {EXAMPLE_CATEGORIES.map((cat) => (
+            <div key={cat.label} style={{
+              background: 'var(--card)',
+              border: '1px solid var(--border)',
+              borderRadius: '0.625rem',
+              padding: '0.875rem',
+            }}>
+              <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--muted-foreground)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                <span>{cat.icon}</span> {cat.label}
+              </div>
+              {cat.examples.map((ex) => (
+                <button
+                  key={ex}
+                  onClick={() => onExampleClick?.(ex)}
+                  style={{
+                    display: 'block',
+                    width: '100%',
+                    textAlign: 'left',
+                    background: 'none',
+                    border: 'none',
+                    padding: '0.25rem 0',
+                    fontSize: '0.8125rem',
+                    color: 'var(--ats-indigo)',
+                    cursor: 'pointer',
+                    lineHeight: 1.4,
+                  }}
+                >
+                  {ex}
+                </button>
+              ))}
+            </div>
           ))}
         </div>
       </div>

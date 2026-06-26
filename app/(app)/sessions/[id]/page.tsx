@@ -4,6 +4,7 @@ import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supab
 import { AnalysisDisplay } from '@/components/sessions/AnalysisDisplay'
 import { MatchedPlaybookCards } from '@/components/sessions/MatchedPlaybookCards'
 import { AnalyzeTrigger } from '@/components/sessions/AnalyzeTrigger'
+import { ReportBuilderButton } from '@/components/sessions/ReportBuilderButton'
 import type { SessionAnalysis, Playbook, PlaybookMatch } from '@/lib/types'
 
 export default async function SessionDetailPage({
@@ -57,7 +58,16 @@ export default async function SessionDetailPage({
             {new Date(session.session_date).toLocaleDateString()} — {agent?.name ?? 'Session'}
           </h1>
         </div>
-        <span className={`badge badge-${session.status}`} style={{ flexShrink: 0 }}>{session.status}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
+          <span className={`badge badge-${session.status}`}>{session.status}</span>
+          {analysis && (
+            <ReportBuilderButton
+              sessionId={id}
+              analysis={analysis}
+              agentName={agent?.name ?? 'Agent'}
+            />
+          )}
+        </div>
       </div>
 
       <div className="page-body" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>

@@ -11,6 +11,55 @@ export async function fetchContext(
   const sources: ContextUsed[] = []
   const parts: string[] = []
 
+  // Fetch agent profiles
+  const { data: agents } = await db
+    .from('agents')
+    .select('id, name, agency_name, category')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(20)
+
+  if (agents && agents.length > 0) {
+    // Fetch session counts and last-seen per agent
+    const { data: sessionMeta } = await db
+      .from('sessions')
+      .select('agent_id, session_date, session_analysis(problem_tags)')
+      .eq('user_id', userId)
+      .eq('status', 'processed')
+
+    const agentSessionMap: Record<string, { count: number; lastDate: string; tags: string[] }> = {}
+    if (sessionMeta) {
+      for (const s of sessionMeta) {
+        const aid = s.agent_id as string
+        const entry = agentSessionMap[aid] ?? { count: 0, lastDate: '', tags: [] }
+        entry.count++
+        if (!entry.lastDate || s.session_date > entry.lastDate) entry.lastDate = s.session_date as string
+        const analysis = s.session_analysis as { problem_tags?: string[] } | null
+        if (analysis?.problem_tags) entry.tags.push(...analysis.problem_tags)
+        agentSessionMap[aid] = entry
+      }
+    }
+
+    parts.push('## Agents in Your Portfolio\n')
+    for (const agent of agents) {
+      const meta = agentSessionMap[agent.id]
+      const topTags = meta
+        ? [...new Set(meta.tags)].slice(0, 3).join(', ')
+        : 'no sessions yet'
+      const lastSeen = meta?.lastDate
+        ? new Date(meta.lastDate).toLocaleDateString()
+        : 'never'
+      parts.push(
+        `- ${agent.name} (${agent.category ?? 'unclassified'}) — ${agent.agency_name}, ${meta?.count ?? 0} sessions, last seen ${lastSeen}${topTags ? `. Key problems: ${topTags}` : ''}`
+      )
+      sources.push({
+        type: 'agent',
+        id: agent.id,
+        label: `Agent: ${agent.name}`,
+      })
+    }
+  }
+
   // Fetch relevant sessions + analyses
   let sessionQuery = db
     .from('sessions')

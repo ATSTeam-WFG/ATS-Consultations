@@ -44,9 +44,28 @@ export default function QAPage() {
     const res = await fetch('/api/qa/conversations', { method: 'POST' })
     const json = await res.json()
     if (json.data) {
-      setConversations((prev) => [json.data, ...prev])
-      setActiveConversationId(json.data.id)
+      const newConv = json.data
+      setConversations((prev) => [newConv, ...prev])
+      setActiveConversationId(newConv.id)
       setMessages([])
+
+      // Proactive greeting if user has sessions
+      fetch('/api/qa/greeting', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ conversation_id: newConv.id }),
+      }).then((r) => r.json()).then((j) => {
+        if (j.data?.content) {
+          setMessages([{
+            id: `greeting-${newConv.id}`,
+            conversation_id: newConv.id,
+            role: 'assistant',
+            content: j.data.content,
+            context_used: null,
+            created_at: new Date().toISOString(),
+          }])
+        }
+      }).catch(() => {})
     }
     setLoading(false)
   }
@@ -232,6 +251,7 @@ export default function QAPage() {
           messages={messages}
           streamingContent={streamingContent}
           loading={loading}
+          onExampleClick={(text) => sendMessage(text)}
         />
 
         <ChatInput onSubmit={sendMessage} loading={loading} />

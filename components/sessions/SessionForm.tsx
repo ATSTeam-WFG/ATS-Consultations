@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { RecordButton } from './RecordButton'
 
 interface AgentOption {
   id: string
@@ -19,6 +20,7 @@ export function SessionForm({ agents, defaultAgentId }: SessionFormProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [transcriptFile, setTranscriptFile] = useState<File | null>(null)
+  const [showAnalyzeBanner, setShowAnalyzeBanner] = useState(false)
   const [form, setForm] = useState({
     agent_id: defaultAgentId ?? (agents[0]?.id ?? ''),
     session_type: 'zoom_call',
@@ -31,6 +33,14 @@ export function SessionForm({ agents, defaultAgentId }: SessionFormProps) {
 
   function set(field: string, value: string) {
     setForm((prev) => ({ ...prev, [field]: value }))
+  }
+
+  function handleTranscriptFill(text: string) {
+    setForm((prev) => ({ ...prev, transcript_text: prev.transcript_text ? prev.transcript_text + '\n\n' + text : text }))
+    const today = new Date().toISOString().split('T')[0]
+    if (form.session_date <= today) {
+      setShowAnalyzeBanner(true)
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -169,10 +179,75 @@ export function SessionForm({ agents, defaultAgentId }: SessionFormProps) {
           className="form-input"
           style={{ resize: 'vertical', minHeight: '120px' }}
           value={form.transcript_text}
-          onChange={(e) => set('transcript_text', e.target.value)}
-          placeholder="Paste transcript here, or upload a file below..."
+          onChange={(e) => {
+            set('transcript_text', e.target.value)
+            if (e.target.value && form.session_date <= new Date().toISOString().split('T')[0]) {
+              setShowAnalyzeBanner(true)
+            }
+          }}
+          placeholder="Paste transcript here, or record / upload a file below..."
         />
       </div>
+
+      <div className="form-group">
+        <label className="form-label" style={{ marginBottom: '0.5rem', display: 'block' }}>
+          Voice recording
+        </label>
+        <RecordButton onTranscript={handleTranscriptFill} />
+        <p style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)', marginTop: '0.375rem' }}>
+          Speak during or after a session — transcript auto-fills above.
+        </p>
+      </div>
+
+      {showAnalyzeBanner && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0.75rem 1rem',
+          background: 'var(--ats-indigo-light)',
+          border: '1px solid var(--ats-indigo)',
+          borderRadius: '0.5rem',
+          gap: '0.75rem',
+        }}>
+          <span style={{ fontSize: '0.875rem', color: 'var(--ats-indigo-dark)', fontWeight: 500 }}>
+            Transcript ready — analyze now?
+          </span>
+          <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                padding: '0.375rem 0.875rem',
+                background: 'var(--ats-indigo)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '0.375rem',
+                fontSize: '0.8125rem',
+                fontWeight: 600,
+                cursor: loading ? 'not-allowed' : 'pointer',
+              }}
+            >
+              Create &amp; Analyze
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowAnalyzeBanner(false)}
+              style={{
+                padding: '0.375rem 0.625rem',
+                background: 'none',
+                border: '1px solid var(--ats-indigo)',
+                borderRadius: '0.375rem',
+                fontSize: '0.8125rem',
+                cursor: 'pointer',
+                color: 'var(--ats-indigo)',
+              }}
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="form-group">
         <label className="form-label">Upload transcript file (.txt)</label>

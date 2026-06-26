@@ -388,6 +388,7 @@
   line-height: 1.25;
 }
 
+.badge-scheduled  { background: #eef2ff; color: #4338ca; }
 .badge-pending    { background: #fef9c3; color: #854d0e; }
 .badge-processing { background: var(--ats-indigo-light); color: var(--ats-indigo-dark); }
 .badge-processed  { background: #dcfce7; color: #14532d; }
@@ -1010,4 +1011,30 @@
   text-align: center;
   color: var(--ats-text-3);
   gap: 0.75rem;
+}
+
+/* ============================================================
+   Calendar
+   ============================================================ */
+.cal-day-add-hint {
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+
+div:hover > .cal-day-add-hint {
+  opacity: 0.35;
+}
+
+/* ============================================================
+   Keyframes
+   ============================================================ */
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
