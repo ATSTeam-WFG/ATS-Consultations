@@ -74,7 +74,7 @@ export async function processSession(sessionId: string): Promise<SessionAnalysis
   }
 }
 
-function buildSessionContent(session: {
+export function buildSessionContent(session: {
   transcript_text?: string | null
   notes?: string | null
   rep_name?: string | null

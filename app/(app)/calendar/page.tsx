@@ -11,12 +11,10 @@ export default async function CalendarPage() {
     db
       .from('sessions')
       .select('id, session_date, status, agent_id, agents(name, agency_name)')
-      .eq('user_id', user!.id)
       .order('session_date', { ascending: false }),
     db
       .from('agents')
       .select('id, name, agency_name')
-      .eq('user_id', user!.id)
       .order('name'),
   ])
 
