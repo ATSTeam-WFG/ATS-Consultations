@@ -257,6 +257,37 @@ export interface DashboardMetrics {
 }
 
 // ============================================================
+// Intake
+// ============================================================
+export interface IntakeToken {
+  id: string
+  token: string
+  agent_id: string
+  created_by: string
+  submitted_at: string | null
+  created_at: string
+}
+
+export interface AgentIntake {
+  id: string
+  token_id: string
+  agent_id: string
+  responses: IntakeResponses
+  submitted_at: string
+}
+
+export interface IntakeResponses {
+  monthly_volume?: string
+  team_size?: string
+  current_software?: string[]
+  challenge_areas?: string[]
+  biggest_bottleneck?: string
+  success_looks_like?: string
+  additional_context?: string
+  preferred_contact?: { name: string; email: string }
+}
+
+// ============================================================
 // API Response shapes
 // ============================================================
 export interface ApiResponse<T> {

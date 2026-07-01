@@ -50,7 +50,7 @@ create table if not exists sessions (
   notes text,
   transcript_url text,
   transcript_text text,
-  status text not null default 'pending' check (status in ('pending', 'processing', 'processed', 'failed')),
+  status text not null default 'pending' check (status in ('scheduled', 'pending', 'processing', 'processed', 'failed')),
   session_type text check (session_type in ('walk_in', 'zoom_call')) default 'zoom_call',
   created_at timestamptz default now(),
   updated_at timestamptz default now()

@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation'
 import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supabase'
 import { Pencil, CalendarDays } from 'lucide-react'
 import { AgentPlaybooks } from '@/components/agents/AgentPlaybooks'
-import type { Session, TitleAgentCategory, Contact, AgentPlaybook, Playbook } from '@/lib/types'
+import { IntakeCard } from '@/components/agents/IntakeCard'
+import type { Session, TitleAgentCategory, Contact, AgentPlaybook, Playbook, IntakeToken, AgentIntake } from '@/lib/types'
 
 const CATEGORY_BADGE: Record<TitleAgentCategory, string> = {
   UNICORN: 'badge-unicorn',
@@ -33,9 +34,11 @@ export default async function AgentDetailPage({
   const sessions: Session[] = agent.sessions ?? []
   const contacts: Contact[] = agent.contacts ?? []
 
-  const [{ data: bookmarkedPlaybooks }, { data: allPlaybooks }] = await Promise.all([
+  const [{ data: bookmarkedPlaybooks }, { data: allPlaybooks }, { data: latestToken }, { data: latestIntake }] = await Promise.all([
     db.from('agent_playbooks').select('*, playbook:playbooks(*)').eq('agent_id', id).order('created_at', { ascending: false }),
     db.from('playbooks').select('*').eq('status', 'published').order('title'),
+    db.from('intake_tokens').select('*').eq('agent_id', id).order('created_at', { ascending: false }).limit(1).maybeSingle(),
+    db.from('agent_intakes').select('*').eq('agent_id', id).order('submitted_at', { ascending: false }).limit(1).maybeSingle(),
   ])
 
   return (
@@ -211,6 +214,13 @@ export default async function AgentDetailPage({
             </div>
           )}
         </div>
+        {/* Intake */}
+        <IntakeCard
+          agentId={id}
+          initialToken={(latestToken as IntakeToken | null) ?? null}
+          initialIntake={(latestIntake as AgentIntake | null) ?? null}
+        />
+
         {/* Playbook bookmarks */}
         <AgentPlaybooks
           agentId={id}

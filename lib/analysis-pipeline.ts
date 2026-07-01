@@ -1,6 +1,6 @@
 import { createServiceRoleClient } from './supabase'
 import { analyzeSession, detectTrends as detectTrendsWithClaude } from './claude'
-import type { SessionAnalysis } from './types'
+import type { SessionAnalysis, IntakeResponses } from './types'
 
 // ============================================================
 // Process a single session: run Claude analysis + store result
@@ -24,8 +24,24 @@ export async function processSession(sessionId: string): Promise<SessionAnalysis
 
     if (error || !session) throw new Error('Session not found')
 
-    const agent = session.agents as { name: string; agency_name?: string } | null
-    const content = buildSessionContent(session)
+    const agent = session.agents as { name: string; agency_name?: string; id?: string } | null
+
+    // Fetch latest intake for this agent if available
+    let intakeResponses: IntakeResponses | undefined
+    if (session.agent_id) {
+      const { data: latestIntake } = await db
+        .from('agent_intakes')
+        .select('responses')
+        .eq('agent_id', session.agent_id)
+        .order('submitted_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      if (latestIntake) {
+        intakeResponses = latestIntake.responses as IntakeResponses
+      }
+    }
+
+    const content = buildSessionContent(session, intakeResponses)
 
     // Run Claude analysis
     const analysisResult = await analyzeSession(
@@ -74,13 +90,16 @@ export async function processSession(sessionId: string): Promise<SessionAnalysis
   }
 }
 
-export function buildSessionContent(session: {
-  transcript_text?: string | null
-  notes?: string | null
-  rep_name?: string | null
-  session_date: string
-  duration_minutes?: number | null
-}): string {
+export function buildSessionContent(
+  session: {
+    transcript_text?: string | null
+    notes?: string | null
+    rep_name?: string | null
+    session_date: string
+    duration_minutes?: number | null
+  },
+  intakeResponses?: IntakeResponses
+): string {
   const parts: string[] = []
 
   parts.push(`Session Date: ${session.session_date}`)
@@ -95,6 +114,22 @@ export function buildSessionContent(session: {
   if (session.transcript_text) {
     parts.push('\n--- Transcript ---')
     parts.push(session.transcript_text)
+  }
+
+  if (intakeResponses) {
+    parts.push('\n--- Agent Pre-Consultation Intake ---')
+    if (intakeResponses.monthly_volume)
+      parts.push(`Monthly Volume: ${intakeResponses.monthly_volume} transactions`)
+    if (intakeResponses.team_size)
+      parts.push(`Team Size: ${intakeResponses.team_size}`)
+    if (intakeResponses.current_software?.length)
+      parts.push(`Current Software: ${intakeResponses.current_software.join(', ')}`)
+    if (intakeResponses.challenge_areas?.length)
+      parts.push(`Stated Pain Areas: ${intakeResponses.challenge_areas.join(', ')}`)
+    if (intakeResponses.biggest_bottleneck)
+      parts.push(`Biggest Bottleneck: ${intakeResponses.biggest_bottleneck}`)
+    if (intakeResponses.success_looks_like)
+      parts.push(`Success Criteria: ${intakeResponses.success_looks_like}`)
   }
 
   return parts.join('\n')
