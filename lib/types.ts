@@ -287,6 +287,18 @@ export interface IntakeResponses {
   preferred_contact?: { name: string; email: string }
 }
 
+export interface IntakeQuestion {
+  id: string
+  key: string
+  type: 'choice' | 'multiselect' | 'text' | 'contact'
+  title: string
+  subtitle: string | null
+  options: { label: string; value: string }[] | null
+  max_select: number | null
+  display_order: number
+  enabled: boolean
+}
+
 // ============================================================
 // API Response shapes
 // ============================================================

@@ -25,8 +25,10 @@ export async function POST(
     .limit(1)
     .maybeSingle()
 
+  const base = (process.env.NEXT_PUBLIC_APP_URL ?? '').replace(/\/$/, '')
+
   if (existing) {
-    const url = `${process.env.NEXT_PUBLIC_APP_URL ?? ''}/intake/${existing.token}`
+    const url = `${base}/intake/${existing.token}`
     return NextResponse.json({ token: existing.token, url })
   }
 
@@ -40,6 +42,6 @@ export async function POST(
     return NextResponse.json({ error: 'Failed to create token' }, { status: 500 })
   }
 
-  const url = `${process.env.NEXT_PUBLIC_APP_URL ?? ''}/intake/${tokenRow.token}`
+  const url = `${base}/intake/${tokenRow.token}`
   return NextResponse.json({ token: tokenRow.token, url })
 }

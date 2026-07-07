@@ -2,14 +2,15 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Users, CalendarDays, Calendar, MessageSquare } from 'lucide-react'
+import { LayoutDashboard, Users, CalendarDays, Calendar, MessageSquare, Settings } from 'lucide-react'
 
 const TABS = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/agents',    label: 'Agents',    icon: Users },
-  { href: '/sessions',  label: 'Sessions',  icon: CalendarDays },
-  { href: '/calendar',  label: 'Calendar',  icon: Calendar },
-  { href: '/qa',        label: 'Ask',       icon: MessageSquare },
+  { href: '/dashboard',       label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/agents',          label: 'Agents',    icon: Users },
+  { href: '/sessions',        label: 'Sessions',  icon: CalendarDays },
+  { href: '/calendar',        label: 'Calendar',  icon: Calendar },
+  { href: '/qa',              label: 'Ask',       icon: MessageSquare },
+  { href: '/settings/intake', label: 'Settings',  icon: Settings },
 ]
 
 export function BottomNav() {

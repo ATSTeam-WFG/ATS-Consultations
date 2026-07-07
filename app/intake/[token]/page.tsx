@@ -1,14 +1,7 @@
 import { notFound } from 'next/navigation'
+import { createServiceRoleClient } from '@/lib/supabase'
 import { IntakeForm } from '@/components/intake/IntakeForm'
-import type { Contact } from '@/lib/types'
-
-interface IntakeData {
-  agentName: string
-  agencyName: string
-  wfgRep: string | null
-  contacts: Contact[]
-  alreadySubmitted: boolean
-}
+import type { Contact, IntakeQuestion } from '@/lib/types'
 
 export default async function IntakePage({
   params,
@@ -16,15 +9,31 @@ export default async function IntakePage({
   params: Promise<{ token: string }>
 }) {
   const { token } = await params
+  const db = createServiceRoleClient()
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-  const res = await fetch(`${baseUrl}/api/intake/${token}`, { cache: 'no-store' })
+  const { data: tokenRow, error: tokenError } = await db
+    .from('intake_tokens')
+    .select('agent_id, submitted_at')
+    .eq('token', token)
+    .single()
 
-  if (!res.ok) notFound()
+  if (tokenError || !tokenRow) notFound()
 
-  const data: IntakeData = await res.json()
+  const { data: agent } = await db
+    .from('agents')
+    .select('name, agency_name, wfg_rep, contacts')
+    .eq('id', tokenRow.agent_id)
+    .single()
 
-  if (data.alreadySubmitted) {
+  if (!agent) notFound()
+
+  const { data: questions } = await db
+    .from('intake_questions')
+    .select('*')
+    .eq('enabled', true)
+    .order('display_order', { ascending: true })
+
+  if (tokenRow.submitted_at !== null) {
     return (
       <div style={{
         minHeight: '100vh',
@@ -60,10 +69,11 @@ export default async function IntakePage({
   return (
     <IntakeForm
       token={token}
-      agentName={data.agentName}
-      agencyName={data.agencyName}
-      wfgRep={data.wfgRep}
-      contacts={data.contacts}
+      agentName={agent.name}
+      agencyName={agent.agency_name}
+      wfgRep={agent.wfg_rep}
+      contacts={(agent.contacts ?? []) as Contact[]}
+      questions={(questions ?? []) as IntakeQuestion[]}
     />
   )
 }

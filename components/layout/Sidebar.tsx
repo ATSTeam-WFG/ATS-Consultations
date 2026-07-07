@@ -13,6 +13,7 @@ import {
   Wrench,
   MessageSquare,
   LogOut,
+  Settings,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase-client'
 import { useRouter } from 'next/navigation'
@@ -52,6 +53,12 @@ const NAV = [
     section: 'Q&A',
     items: [
       { href: '/qa', label: 'Ask', icon: MessageSquare },
+    ],
+  },
+  {
+    section: 'Settings',
+    items: [
+      { href: '/settings/intake', label: 'Intake Questions', icon: Settings },
     ],
   },
 ]

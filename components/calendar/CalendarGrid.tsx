@@ -7,7 +7,7 @@ import {
   eachDayOfInterval, format, isSameMonth, isToday,
   addMonths, subMonths, isBefore, isAfter,
 } from 'date-fns'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Pencil } from 'lucide-react'
 import { ScheduleModal } from './ScheduleModal'
 import type { SessionStatus } from '@/lib/types'
 
@@ -38,11 +38,19 @@ const STATUS_STYLE: Record<SessionStatus, { bg: string; border: string; dot: str
   failed:    { bg: '#fef2f2', border: '#ef4444', dot: '#ef4444', label: '⚠' },
 }
 
+interface RescheduleTarget {
+  id: string
+  session_date: string
+  agent_id: string
+  agent_name: string
+}
+
 export function CalendarGrid({ sessions: initialSessions, agents }: CalendarGridProps) {
   const router = useRouter()
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [sessions, setSessions] = useState(initialSessions)
   const [scheduleDate, setScheduleDate] = useState<string | null>(null)
+  const [rescheduleTarget, setRescheduleTarget] = useState<RescheduleTarget | null>(null)
 
   const today = new Date()
   const monthStart = startOfMonth(currentMonth)
@@ -70,12 +78,26 @@ export function CalendarGrid({ sessions: initialSessions, agents }: CalendarGrid
 
   function handleEventClick(e: React.MouseEvent, session: CalendarSession) {
     e.stopPropagation()
-    router.push(`/sessions/${session.id}`)
+    if (session.status === 'scheduled') {
+      setRescheduleTarget({
+        id: session.id,
+        session_date: session.session_date,
+        agent_id: session.agent_id,
+        agent_name: session.agents?.name ?? 'Unknown',
+      })
+    } else {
+      router.push(`/sessions/${session.id}`)
+    }
   }
 
   function handleScheduled(newSession: { id: string; agent_id: string; session_date: string; status: string; agents?: { name: string } }) {
     setSessions((prev) => [...prev, newSession as CalendarSession])
     setScheduleDate(null)
+  }
+
+  function handleRescheduled(updated: { id: string; agent_id: string; session_date: string; status: string; agents?: { name: string } }) {
+    setSessions(prev => prev.map(s => s.id === updated.id ? { ...s, session_date: updated.session_date } : s))
+    setRescheduleTarget(null)
   }
 
   // Sidebar data
@@ -176,7 +198,7 @@ export function CalendarGrid({ sessions: initialSessions, agents }: CalendarGrid
                       <button
                         key={session.id}
                         onClick={(e) => handleEventClick(e, session)}
-                        title={`${style.label} ${agentName}`}
+                        title={session.status === 'scheduled' ? `Reschedule: ${agentName}` : `${style.label} ${agentName}`}
                         style={{
                           display: 'flex',
                           alignItems: 'center',
@@ -197,7 +219,10 @@ export function CalendarGrid({ sessions: initialSessions, agents }: CalendarGrid
                         }}
                       >
                         <span style={{ flexShrink: 0 }}>{style.label}</span>
-                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{agentName}</span>
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>{agentName}</span>
+                        {session.status === 'scheduled' && (
+                          <Pencil size={9} style={{ flexShrink: 0, opacity: 0.6 }} />
+                        )}
                       </button>
                     )
                   })}
@@ -304,6 +329,16 @@ export function CalendarGrid({ sessions: initialSessions, agents }: CalendarGrid
           agents={agents}
           onClose={() => setScheduleDate(null)}
           onScheduled={handleScheduled}
+        />
+      )}
+
+      {rescheduleTarget && (
+        <ScheduleModal
+          date={rescheduleTarget.session_date}
+          agents={agents}
+          onClose={() => setRescheduleTarget(null)}
+          onScheduled={handleRescheduled}
+          existingSession={rescheduleTarget}
         />
       )}
     </div>
