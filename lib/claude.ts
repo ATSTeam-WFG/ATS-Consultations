@@ -286,7 +286,7 @@ export async function detectTrends(
 
 Tag data: ${JSON.stringify(tagCounts, null, 2)}
 
-For each tag with count >= 2, return a JSON array:
+For each tag with count >= 1, return a JSON array:
 [
   {
     "tag": "tag_name",

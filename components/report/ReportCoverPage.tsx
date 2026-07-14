@@ -2,86 +2,121 @@ import { Page, View, Text, StyleSheet } from '@react-pdf/renderer'
 
 const s = StyleSheet.create({
   page: {
-    backgroundColor: '#0d1117',
+    backgroundColor: '#0a0c10',
     padding: 0,
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  seal: {
-    width: 64,
-    height: 64,
-    borderRadius: 8,
-    backgroundColor: '#6366f1',
+  topBar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 4,
+    backgroundColor: '#c4a574',
+  },
+  monogramRing: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    border: '1.5pt solid #c4a574',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
   },
-  sealText: {
-    color: '#ffffff',
-    fontSize: 28,
+  monogram: {
+    color: '#c4a574',
+    fontSize: 32,
     fontWeight: 'bold',
-  },
-  brand: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#ffffff',
     letterSpacing: 1,
-    marginBottom: 4,
   },
-  brandAccent: {
-    color: '#6366f1',
-  },
-  tagline: {
-    fontSize: 8,
-    color: '#6366f1',
+  reportType: {
+    fontSize: 7,
+    color: '#c4a574',
     letterSpacing: 3,
     textTransform: 'uppercase',
-    marginBottom: 48,
+    marginBottom: 3,
   },
-  divider: {
-    width: 48,
-    height: 2,
-    backgroundColor: '#6366f1',
-    marginBottom: 32,
+  reportSubtype: {
+    fontSize: 7,
+    color: '#4b5563',
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    marginBottom: 20,
+  },
+  dividerTop: {
+    width: 40,
+    height: 1,
+    backgroundColor: '#c4a574',
+    marginBottom: 24,
   },
   agentName: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
     color: '#ffffff',
     marginBottom: 8,
     textAlign: 'center',
   },
   agencyName: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#9ca3af',
-    marginBottom: 32,
+    marginBottom: 24,
     textAlign: 'center',
+  },
+  dividerBottom: {
+    width: 40,
+    height: 1,
+    backgroundColor: '#a8894f',
+    marginBottom: 24,
   },
   metaGrid: {
     flexDirection: 'row',
-    gap: 24,
+    alignItems: 'center',
     marginBottom: 8,
   },
   metaItem: {
     alignItems: 'center',
+    paddingHorizontal: 16,
+  },
+  metaSeparator: {
+    width: 1,
+    height: 24,
+    backgroundColor: '#1f2937',
   },
   metaLabel: {
-    fontSize: 9,
-    color: '#4b5563',
+    fontSize: 7,
+    color: '#6b7280',
     textTransform: 'uppercase',
     letterSpacing: 1,
     marginBottom: 4,
   },
   metaValue: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#d1d5db',
     fontWeight: 'bold',
   },
-  footer: {
+  footerRule: {
     position: 'absolute',
-    bottom: 32,
-    fontSize: 8,
+    bottom: 48,
+    left: 40,
+    right: 40,
+    height: 1,
+    backgroundColor: '#1f2937',
+  },
+  footerConfidential: {
+    position: 'absolute',
+    bottom: 30,
+    fontSize: 7,
+    color: '#c4a574',
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    textAlign: 'center',
+  },
+  footerDate: {
+    position: 'absolute',
+    bottom: 18,
+    fontSize: 7,
     color: '#374151',
     textAlign: 'center',
   },
@@ -101,31 +136,39 @@ export function ReportCoverPage({ agentName, agencyName, sessionDate, sessionTyp
 
   return (
     <Page size="LETTER" style={s.page}>
-      <View style={s.seal}>
-        <Text style={s.sealText}>A</Text>
+      <View style={s.topBar} />
+      <View style={s.monogramRing}>
+        <Text style={s.monogram}>ATS</Text>
       </View>
-      <Text style={s.brand}>ATS <Text style={s.brandAccent}>Consultations</Text></Text>
-      <Text style={s.tagline}>White Glove Intelligence</Text>
-      <View style={s.divider} />
+      <Text style={s.reportType}>ATS Consultations</Text>
+      <Text style={s.reportSubtype}>Consultation Analysis Report</Text>
+      <View style={s.dividerTop} />
       <Text style={s.agentName}>{agentName}</Text>
       <Text style={s.agencyName}>{agencyName}</Text>
+      <View style={s.dividerBottom} />
       <View style={s.metaGrid}>
         <View style={s.metaItem}>
           <Text style={s.metaLabel}>Date</Text>
           <Text style={s.metaValue}>{date}</Text>
         </View>
+        <View style={s.metaSeparator} />
         <View style={s.metaItem}>
           <Text style={s.metaLabel}>Session Type</Text>
           <Text style={s.metaValue}>{typeLabel}</Text>
         </View>
         {repName && (
-          <View style={s.metaItem}>
-            <Text style={s.metaLabel}>WFG Rep</Text>
-            <Text style={s.metaValue}>{repName}</Text>
-          </View>
+          <>
+            <View style={s.metaSeparator} />
+            <View style={s.metaItem}>
+              <Text style={s.metaLabel}>WFG Rep</Text>
+              <Text style={s.metaValue}>{repName}</Text>
+            </View>
+          </>
         )}
       </View>
-      <Text style={s.footer}>ATS Consultations · Confidential · Generated {new Date().toLocaleDateString()}</Text>
+      <View style={s.footerRule} />
+      <Text style={s.footerConfidential}>Confidential</Text>
+      <Text style={s.footerDate}>Generated {new Date().toLocaleDateString()}</Text>
     </Page>
   )
 }

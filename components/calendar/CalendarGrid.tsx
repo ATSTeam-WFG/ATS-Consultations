@@ -100,6 +100,10 @@ export function CalendarGrid({ sessions: initialSessions, agents }: CalendarGrid
     setRescheduleTarget(null)
   }
 
+  function handleDeleted(id: string) {
+    setSessions(prev => prev.filter(s => s.id !== id))
+  }
+
   // Sidebar data
   const todayStr = format(today, 'yyyy-MM-dd')
   const weekEnd = format(addMonths(today, 0), 'yyyy-MM-dd')
@@ -339,6 +343,7 @@ export function CalendarGrid({ sessions: initialSessions, agents }: CalendarGrid
           onClose={() => setRescheduleTarget(null)}
           onScheduled={handleRescheduled}
           existingSession={rescheduleTarget}
+          onDeleted={handleDeleted}
         />
       )}
     </div>

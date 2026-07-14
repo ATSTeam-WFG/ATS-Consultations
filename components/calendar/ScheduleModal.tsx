@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { X } from 'lucide-react'
 
 interface AgentOption {
@@ -22,9 +23,11 @@ interface ScheduleModalProps {
   onClose: () => void
   onScheduled: (session: { id: string; agent_id: string; session_date: string; status: string; agents?: { name: string } }) => void
   existingSession?: ExistingSession | null
+  onDeleted?: (id: string) => void
 }
 
-export function ScheduleModal({ date, agents, onClose, onScheduled, existingSession }: ScheduleModalProps) {
+export function ScheduleModal({ date, agents, onClose, onScheduled, existingSession, onDeleted }: ScheduleModalProps) {
+  const router = useRouter()
   const isEdit = !!existingSession
 
   const [agentId, setAgentId] = useState(existingSession?.agent_id ?? agents[0]?.id ?? '')
@@ -33,6 +36,8 @@ export function ScheduleModal({ date, agents, onClose, onScheduled, existingSess
   const [sessionType, setSessionType] = useState('zoom_call')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -74,6 +79,21 @@ export function ScheduleModal({ date, agents, onClose, onScheduled, existingSess
       onScheduled(json.data)
     }
     setLoading(false)
+  }
+
+  async function handleDelete() {
+    if (!existingSession) return
+    setDeleting(true)
+    setError(null)
+    const res = await fetch(`/api/sessions/${existingSession.id}`, { method: 'DELETE' })
+    if (!res.ok) {
+      const json = await res.json()
+      setError(json.error ?? 'Failed to delete')
+      setDeleting(false)
+      return
+    }
+    onDeleted?.(existingSession.id)
+    onClose()
   }
 
   const displayDate = new Date(selectedDate + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
@@ -182,21 +202,68 @@ export function ScheduleModal({ date, agents, onClose, onScheduled, existingSess
 
           {error && <p style={{ fontSize: '0.875rem', color: 'var(--ats-danger)' }}>{error}</p>}
 
-          <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-            <button
-              type="button"
-              onClick={onClose}
-              style={{ padding: '0.5rem 1rem', background: 'var(--secondary)', color: 'var(--secondary-foreground)', border: '1px solid var(--border)', borderRadius: '0.375rem', fontSize: '0.875rem', cursor: 'pointer' }}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              style={{ padding: '0.5rem 1.25rem', background: 'var(--ats-indigo)', color: '#fff', border: 'none', borderRadius: '0.375rem', fontSize: '0.875rem', fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1 }}
-            >
-              {loading ? (isEdit ? 'Rescheduling...' : 'Scheduling...') : (isEdit ? 'Reschedule' : 'Schedule')}
-            </button>
+          <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'space-between', alignItems: 'center' }}>
+            {isEdit && (
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                {!confirmDelete ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setConfirmDelete(true)}
+                      style={{ padding: '0.5rem 0.75rem', background: 'transparent', color: 'var(--ats-danger, #ef4444)', border: '1px solid var(--ats-danger, #ef4444)', borderRadius: '0.375rem', fontSize: '0.8125rem', cursor: 'pointer' }}
+                    >
+                      Delete
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => router.push(`/sessions/new?agent_id=${existingSession!.agent_id}`)}
+                      style={{ padding: '0.5rem 0.75rem', background: 'var(--secondary)', color: 'var(--secondary-foreground)', border: '1px solid var(--border)', borderRadius: '0.375rem', fontSize: '0.8125rem', cursor: 'pointer' }}
+                    >
+                      Log Session
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <span style={{ fontSize: '0.8125rem', color: 'var(--muted-foreground)' }}>Are you sure?</span>
+                    <button
+                      type="button"
+                      onClick={handleDelete}
+                      disabled={deleting}
+                      style={{ padding: '0.5rem 0.75rem', background: 'var(--ats-danger, #ef4444)', color: '#fff', border: 'none', borderRadius: '0.375rem', fontSize: '0.8125rem', fontWeight: 600, cursor: deleting ? 'not-allowed' : 'pointer', opacity: deleting ? 0.7 : 1 }}
+                    >
+                      {deleting ? 'Deleting...' : 'Yes, delete'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setConfirmDelete(false)}
+                      style={{ padding: '0.5rem 0.75rem', background: 'var(--secondary)', color: 'var(--secondary-foreground)', border: '1px solid var(--border)', borderRadius: '0.375rem', fontSize: '0.8125rem', cursor: 'pointer' }}
+                    >
+                      Cancel
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: '0.75rem', marginLeft: isEdit ? 'auto' : undefined }}>
+              {!confirmDelete && (
+                <button
+                  type="button"
+                  onClick={onClose}
+                  style={{ padding: '0.5rem 1rem', background: 'var(--secondary)', color: 'var(--secondary-foreground)', border: '1px solid var(--border)', borderRadius: '0.375rem', fontSize: '0.875rem', cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+              )}
+              {!confirmDelete && (
+                <button
+                  type="submit"
+                  disabled={loading}
+                  style={{ padding: '0.5rem 1.25rem', background: 'var(--ats-indigo)', color: '#fff', border: 'none', borderRadius: '0.375rem', fontSize: '0.875rem', fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1 }}
+                >
+                  {loading ? (isEdit ? 'Rescheduling...' : 'Scheduling...') : (isEdit ? 'Reschedule' : 'Schedule')}
+                </button>
+              )}
+            </div>
           </div>
         </form>
       </div>

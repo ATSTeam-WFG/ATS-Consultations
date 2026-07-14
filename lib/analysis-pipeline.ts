@@ -149,7 +149,7 @@ export async function runTrendDetection(userId: string): Promise<void> {
   if (!analyses || analyses.length === 0) return
 
   // Count tag frequencies
-  const tagMap: Map<string, { count: number; agentIds: Set<string>; severitySum: number }> = new Map()
+  const tagMap: Map<string, { count: number; severitySum: number }> = new Map()
 
   for (const analysis of analyses) {
     const tags = (analysis.problem_tags as string[]) ?? []
@@ -163,7 +163,7 @@ export async function runTrendDetection(userId: string): Promise<void> {
 
     for (const tag of tags) {
       if (!tagMap.has(tag)) {
-        tagMap.set(tag, { count: 0, agentIds: new Set(), severitySum: 0 })
+        tagMap.set(tag, { count: 0, severitySum: 0 })
       }
       const entry = tagMap.get(tag)!
       entry.count++
@@ -176,7 +176,7 @@ export async function runTrendDetection(userId: string): Promise<void> {
     .map(([tag, v]) => ({
       tag,
       count: v.count,
-      agent_count: v.agentIds.size,
+      agent_count: 0,
       avg_severity: v.count > 0 ? v.severitySum / v.count : 1,
     }))
 
@@ -194,7 +194,7 @@ export async function runTrendDetection(userId: string): Promise<void> {
         tag: trend.tag,
         category: trend.category,
         session_count: tagData?.count ?? 0,
-        agent_count: tagData?.agentIds.size ?? 0,
+        agent_count: 0,
         severity_avg: tagData ? tagData.severitySum / tagData.count : null,
         trend_direction: trend.trend_direction,
         description: trend.description,

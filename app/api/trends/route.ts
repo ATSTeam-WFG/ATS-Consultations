@@ -11,6 +11,7 @@ export async function GET() {
   const { data, error } = await db
     .from('trends')
     .select('*')
+    .eq('user_id', user.id)
     .order('session_count', { ascending: false })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
