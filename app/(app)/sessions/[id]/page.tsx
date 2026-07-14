@@ -5,6 +5,7 @@ import { AnalysisDisplay } from '@/components/sessions/AnalysisDisplay'
 import { MatchedPlaybookCards } from '@/components/sessions/MatchedPlaybookCards'
 import { AnalyzeTrigger } from '@/components/sessions/AnalyzeTrigger'
 import { ReportBuilderButton } from '@/components/sessions/ReportBuilderButton'
+import { DeleteSessionButton } from '@/components/sessions/DeleteSessionButton'
 import type { SessionAnalysis, Playbook, PlaybookMatch } from '@/lib/types'
 
 export default async function SessionDetailPage({
@@ -67,6 +68,7 @@ export default async function SessionDetailPage({
               agentName={agent?.name ?? 'Agent'}
             />
           )}
+          <DeleteSessionButton sessionId={id} redirectAfter />
         </div>
       </div>
 

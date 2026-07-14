@@ -144,7 +144,8 @@ export async function runTrendDetection(userId: string): Promise<void> {
   // Aggregate problem tags across all processed sessions
   const { data: analyses } = await db
     .from('session_analysis')
-    .select('problem_tags, pain_points')
+    .select('problem_tags, pain_points, sessions!inner(user_id)')
+    .eq('sessions.user_id', userId)
 
   if (!analyses || analyses.length === 0) return
 
