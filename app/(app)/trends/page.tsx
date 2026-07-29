@@ -8,6 +8,7 @@ export default function TrendsPage() {
   const [trends, setTrends] = useState<Trend[]>([])
   const [loading, setLoading] = useState(true)
   const [running, setRunning] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     fetch('/api/trends')
@@ -18,11 +19,21 @@ export default function TrendsPage() {
 
   async function runDetection() {
     setRunning(true)
-    await fetch('/api/trends', { method: 'POST' })
-    const res = await fetch('/api/trends')
-    const j = await res.json()
-    setTrends(j.data ?? [])
-    setRunning(false)
+    setError(null)
+    try {
+      const res = await fetch('/api/trends', { method: 'POST' })
+      if (!res.ok) {
+        const j = await res.json()
+        throw new Error(j.error ?? 'Trend detection failed')
+      }
+      const res2 = await fetch('/api/trends')
+      const j2 = await res2.json()
+      setTrends(j2.data ?? [])
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Trend detection failed')
+    } finally {
+      setRunning(false)
+    }
   }
 
   const directionIcon = {
@@ -36,10 +47,21 @@ export default function TrendsPage() {
     stable: 'var(--muted-foreground)',
   }
 
+  const lastRun = trends.length > 0
+    ? trends.reduce((latest, t) => t.updated_at > latest ? t.updated_at : latest, trends[0].updated_at)
+    : null
+
   return (
     <>
       <div className="page-header">
-        <h1 className="page-title">Trends</h1>
+        <div>
+          <h1 className="page-title">Trends</h1>
+          {lastRun && (
+            <p style={{ fontSize: '0.8125rem', color: 'var(--muted-foreground)', marginTop: '0.125rem' }}>
+              Last run: {new Date(lastRun).toLocaleString()}
+            </p>
+          )}
+        </div>
         <button
           onClick={runDetection}
           disabled={running}
@@ -64,6 +86,12 @@ export default function TrendsPage() {
       </div>
 
       <div className="page-body">
+        {error && (
+          <div style={{ background: '#fef2f2', color: '#dc2626', padding: '0.75rem 1rem', borderRadius: '0.5rem', fontSize: '0.875rem', marginBottom: '1rem' }}>
+            {error}
+          </div>
+        )}
+
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}>
             <div className="spinner" />
@@ -83,6 +111,7 @@ export default function TrendsPage() {
                   <th>Problem Tag</th>
                   <th>Direction</th>
                   <th>Sessions</th>
+                  <th>Agents</th>
                   <th>Avg Severity</th>
                   <th>Description</th>
                 </tr>
@@ -105,6 +134,7 @@ export default function TrendsPage() {
                         </div>
                       </td>
                       <td style={{ fontWeight: 600 }}>{trend.session_count}</td>
+                      <td style={{ fontWeight: 600 }}>{trend.agent_count}</td>
                       <td style={{ color: 'var(--muted-foreground)' }}>
                         {trend.severity_avg ? trend.severity_avg.toFixed(1) : '—'}
                       </td>

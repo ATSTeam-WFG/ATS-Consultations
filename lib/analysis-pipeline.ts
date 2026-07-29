@@ -141,20 +141,33 @@ export function buildSessionContent(
 export async function runTrendDetection(userId: string): Promise<void> {
   const db = createServiceRoleClient()
 
+  // Fetch existing trend records to use as baseline for direction
+  const { data: existingTrends } = await db
+    .from('trends')
+    .select('tag, session_count')
+    .eq('user_id', userId)
+
+  const existingCounts = new Map<string, number>(
+    (existingTrends ?? []).map((t: { tag: string; session_count: number }) => [t.tag, t.session_count])
+  )
+
   // Aggregate problem tags across all processed sessions
   const { data: analyses } = await db
     .from('session_analysis')
-    .select('problem_tags, pain_points, sessions!inner(user_id)')
+    .select('problem_tags, pain_points, sessions!inner(user_id, agent_id)')
     .eq('sessions.user_id', userId)
 
   if (!analyses || analyses.length === 0) return
 
-  // Count tag frequencies
-  const tagMap: Map<string, { count: number; severitySum: number }> = new Map()
+  // Count tag frequencies and unique agents per tag
+  const tagMap: Map<string, { count: number; severitySum: number; agentIds: Set<string> }> = new Map()
 
   for (const analysis of analyses) {
     const tags = (analysis.problem_tags as string[]) ?? []
     const painPoints = (analysis.pain_points as { severity?: string }[]) ?? []
+    const session = analysis.sessions as unknown as { user_id: string; agent_id: string | null } | null
+    const agentId = session?.agent_id ?? null
+
     const avgSeverity = painPoints.length > 0
       ? painPoints.reduce((sum, pp) => {
           const severityMap: Record<string, number> = { low: 1, medium: 2, high: 3, critical: 4 }
@@ -164,11 +177,12 @@ export async function runTrendDetection(userId: string): Promise<void> {
 
     for (const tag of tags) {
       if (!tagMap.has(tag)) {
-        tagMap.set(tag, { count: 0, severitySum: 0 })
+        tagMap.set(tag, { count: 0, severitySum: 0, agentIds: new Set() })
       }
       const entry = tagMap.get(tag)!
       entry.count++
       entry.severitySum += avgSeverity
+      if (agentId) entry.agentIds.add(agentId)
     }
   }
 
@@ -177,28 +191,44 @@ export async function runTrendDetection(userId: string): Promise<void> {
     .map(([tag, v]) => ({
       tag,
       count: v.count,
-      agent_count: 0,
+      agent_count: v.agentIds.size,
       avg_severity: v.count > 0 ? v.severitySum / v.count : 1,
     }))
 
   if (tagCounts.length === 0) return
 
-  // Run Claude trend analysis
+  // Run Claude for descriptions and categories only (direction computed from history)
   const trends = await detectTrendsWithClaude(tagCounts)
 
-  // Upsert trends
+  // Upsert trends with deterministic direction
   for (const trend of trends) {
     const tagData = tagMap.get(trend.tag)
+    if (!tagData) continue
+
+    const newCount = tagData.count
+    const prevCount = existingCounts.get(trend.tag) ?? null
+    let direction: 'rising' | 'stable' | 'falling'
+    if (prevCount === null) {
+      direction = 'stable'
+    } else if (newCount > prevCount) {
+      direction = 'rising'
+    } else if (newCount < prevCount) {
+      direction = 'falling'
+    } else {
+      direction = 'stable'
+    }
+
     await db.from('trends').upsert(
       {
         user_id: userId,
         tag: trend.tag,
         category: trend.category,
-        session_count: tagData?.count ?? 0,
-        agent_count: 0,
-        severity_avg: tagData ? tagData.severitySum / tagData.count : null,
-        trend_direction: trend.trend_direction,
+        session_count: newCount,
+        agent_count: tagData.agentIds.size,
+        severity_avg: tagData.severitySum / tagData.count,
+        trend_direction: direction,
         description: trend.description,
+        previous_session_count: prevCount ?? 0,
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'user_id,tag' }

@@ -268,30 +268,22 @@ ${context.slice(0, 3000)}`,
 // ============================================================
 export async function detectTrends(
   tagCounts: { tag: string; count: number; agent_count: number; avg_severity: number }[]
-): Promise<
-  {
-    tag: string
-    trend_direction: 'rising' | 'stable' | 'falling'
-    description: string
-    category: string
-  }[]
-> {
+): Promise<{ tag: string; description: string; category: string }[]> {
   const message = await anthropic.messages.create({
     model: 'claude-haiku-4-5-20251001',
     max_tokens: 1024,
     messages: [
       {
         role: 'user',
-        content: `Analyze these title agency consultation problem tag frequencies and identify trends.
+        content: `Analyze these title agency consultation problem tag frequencies.
 
 Tag data: ${JSON.stringify(tagCounts, null, 2)}
 
-For each tag with count >= 1, return a JSON array:
+For each tag, return a JSON array:
 [
   {
     "tag": "tag_name",
-    "trend_direction": "rising|stable|falling",
-    "description": "1-2 sentence description of what this trend means for title agencies",
+    "description": "1-2 sentence description of what this pattern means for title agencies",
     "category": "category grouping"
   }
 ]

@@ -1,4 +1,9 @@
-import { Page, View, Text, StyleSheet } from '@react-pdf/renderer'
+import { Page, View, Text, StyleSheet, Image } from '@react-pdf/renderer'
+import { existsSync } from 'fs'
+import { join } from 'path'
+
+const NAVY = '#1a2744'
+const GOLD = '#c4a574'
 
 const s = StyleSheet.create({
   page: {
@@ -14,26 +19,55 @@ const s = StyleSheet.create({
     left: 0,
     right: 0,
     height: 4,
-    backgroundColor: '#c4a574',
+    backgroundColor: GOLD,
   },
-  monogramRing: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    border: '1.5pt solid #c4a574',
+  bgAccent: {
+    position: 'absolute',
+    top: -80,
+    right: -80,
+    width: 320,
+    height: 500,
+    backgroundColor: NAVY,
+    opacity: 0.25,
+    transform: 'rotate(-35deg)',
+  },
+  bgAccent2: {
+    position: 'absolute',
+    bottom: -60,
+    left: -60,
+    width: 260,
+    height: 380,
+    backgroundColor: GOLD,
+    opacity: 0.06,
+    transform: 'rotate(-35deg)',
+  },
+  logoWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
   },
-  monogram: {
-    color: '#c4a574',
-    fontSize: 32,
+  logo: {
+    width: 120,
+    height: 'auto',
+  },
+  logoFallback: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    border: `1.5pt solid ${GOLD}`,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 0,
+  },
+  logoFallbackText: {
+    color: GOLD,
+    fontSize: 28,
     fontWeight: 'bold',
     letterSpacing: 1,
   },
   reportType: {
     fontSize: 7,
-    color: '#c4a574',
+    color: GOLD,
     letterSpacing: 3,
     textTransform: 'uppercase',
     marginBottom: 3,
@@ -48,7 +82,7 @@ const s = StyleSheet.create({
   dividerTop: {
     width: 40,
     height: 1,
-    backgroundColor: '#c4a574',
+    backgroundColor: GOLD,
     marginBottom: 24,
   },
   agentName: {
@@ -68,33 +102,27 @@ const s = StyleSheet.create({
     width: 40,
     height: 1,
     backgroundColor: '#a8894f',
-    marginBottom: 24,
+    marginBottom: 28,
   },
-  metaGrid: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  metaList: {
+    alignItems: 'flex-start',
+    gap: 10,
     marginBottom: 8,
   },
-  metaItem: {
-    alignItems: 'center',
-    paddingHorizontal: 16,
-  },
-  metaSeparator: {
-    width: 1,
-    height: 24,
-    backgroundColor: '#1f2937',
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 6,
   },
   metaLabel: {
-    fontSize: 7,
-    color: '#6b7280',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: 4,
+    fontSize: 9,
+    color: GOLD,
+    fontWeight: 'bold',
+    minWidth: 80,
   },
   metaValue: {
     fontSize: 11,
     color: '#d1d5db',
-    fontWeight: 'bold',
   },
   footerRule: {
     position: 'absolute',
@@ -108,7 +136,7 @@ const s = StyleSheet.create({
     position: 'absolute',
     bottom: 30,
     fontSize: 7,
-    color: '#c4a574',
+    color: GOLD,
     letterSpacing: 2,
     textTransform: 'uppercase',
     textAlign: 'center',
@@ -137,38 +165,53 @@ export function ReportCoverPage({ agentName, agencyName, sessionDate, sessionTyp
   return (
     <Page size="LETTER" style={s.page}>
       <View style={s.topBar} />
-      <View style={s.monogramRing}>
-        <Text style={s.monogram}>ATS</Text>
+      <View style={s.bgAccent} />
+      <View style={s.bgAccent2} />
+
+      <View style={s.logoWrapper}>
+        {/* Try logo PNG; fall back to styled monogram if asset missing */}
+        <WFGLogo />
       </View>
+
       <Text style={s.reportType}>ATS Consultations</Text>
       <Text style={s.reportSubtype}>Consultation Analysis Report</Text>
       <View style={s.dividerTop} />
       <Text style={s.agentName}>{agentName}</Text>
       <Text style={s.agencyName}>{agencyName}</Text>
       <View style={s.dividerBottom} />
-      <View style={s.metaGrid}>
-        <View style={s.metaItem}>
-          <Text style={s.metaLabel}>Date</Text>
+
+      <View style={s.metaList}>
+        <View style={s.metaRow}>
+          <Text style={s.metaLabel}>Date:</Text>
           <Text style={s.metaValue}>{date}</Text>
         </View>
-        <View style={s.metaSeparator} />
-        <View style={s.metaItem}>
-          <Text style={s.metaLabel}>Session Type</Text>
+        <View style={s.metaRow}>
+          <Text style={s.metaLabel}>Session Type:</Text>
           <Text style={s.metaValue}>{typeLabel}</Text>
         </View>
         {repName && (
-          <>
-            <View style={s.metaSeparator} />
-            <View style={s.metaItem}>
-              <Text style={s.metaLabel}>WFG Rep</Text>
-              <Text style={s.metaValue}>{repName}</Text>
-            </View>
-          </>
+          <View style={s.metaRow}>
+            <Text style={s.metaLabel}>WFG Rep:</Text>
+            <Text style={s.metaValue}>{repName}</Text>
+          </View>
         )}
       </View>
+
       <View style={s.footerRule} />
       <Text style={s.footerConfidential}>Confidential</Text>
       <Text style={s.footerDate}>Generated {new Date().toLocaleDateString()}</Text>
     </Page>
+  )
+}
+
+function WFGLogo() {
+  const logoPath = join(process.cwd(), 'public', 'wfg-logo.png')
+  if (existsSync(logoPath)) {
+    return <Image src={logoPath} style={s.logo} />
+  }
+  return (
+    <View style={s.logoFallback}>
+      <Text style={s.logoFallbackText}>WFG</Text>
+    </View>
   )
 }
