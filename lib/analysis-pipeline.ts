@@ -1,5 +1,5 @@
 import { createServiceRoleClient } from './supabase'
-import { analyzeSession, detectTrends as detectTrendsWithClaude } from './claude'
+import { analyzeSession, detectTrends as detectTrendsWithClaude, generateTrendInsights } from './claude'
 import type { SessionAnalysis, IntakeResponses } from './types'
 
 // ============================================================
@@ -138,7 +138,7 @@ export function buildSessionContent(
 // ============================================================
 // Detect trends across all sessions for a user
 // ============================================================
-export async function runTrendDetection(userId: string): Promise<void> {
+export async function runTrendDetection(userId: string): Promise<string> {
   const db = createServiceRoleClient()
 
   // Fetch existing trend records to use as baseline for direction
@@ -151,13 +151,12 @@ export async function runTrendDetection(userId: string): Promise<void> {
     (existingTrends ?? []).map((t: { tag: string; session_count: number }) => [t.tag, t.session_count])
   )
 
-  // Aggregate problem tags across all processed sessions
+  // Aggregate problem tags across ALL processed sessions (team-wide)
   const { data: analyses } = await db
     .from('session_analysis')
-    .select('problem_tags, pain_points, sessions!inner(user_id, agent_id)')
-    .eq('sessions.user_id', userId)
+    .select('problem_tags, pain_points, sessions!inner(agent_id)')
 
-  if (!analyses || analyses.length === 0) return
+  if (!analyses || analyses.length === 0) return ''
 
   // Count tag frequencies and unique agents per tag
   const tagMap: Map<string, { count: number; severitySum: number; agentIds: Set<string> }> = new Map()
@@ -165,7 +164,7 @@ export async function runTrendDetection(userId: string): Promise<void> {
   for (const analysis of analyses) {
     const tags = (analysis.problem_tags as string[]) ?? []
     const painPoints = (analysis.pain_points as { severity?: string }[]) ?? []
-    const session = analysis.sessions as unknown as { user_id: string; agent_id: string | null } | null
+    const session = analysis.sessions as unknown as { agent_id: string | null } | null
     const agentId = session?.agent_id ?? null
 
     const avgSeverity = painPoints.length > 0
@@ -195,12 +194,13 @@ export async function runTrendDetection(userId: string): Promise<void> {
       avg_severity: v.count > 0 ? v.severitySum / v.count : 1,
     }))
 
-  if (tagCounts.length === 0) return
+  if (tagCounts.length === 0) return ''
 
   // Run Claude for descriptions and categories only (direction computed from history)
   const trends = await detectTrendsWithClaude(tagCounts)
 
   // Upsert trends with deterministic direction
+  const trendsWithDirection: { tag: string; description: string; category: string; direction: string }[] = []
   for (const trend of trends) {
     const tagData = tagMap.get(trend.tag)
     if (!tagData) continue
@@ -218,7 +218,9 @@ export async function runTrendDetection(userId: string): Promise<void> {
       direction = 'stable'
     }
 
-    await db.from('trends').upsert(
+    trendsWithDirection.push({ ...trend, direction })
+
+    const { error: upsertError } = await db.from('trends').upsert(
       {
         user_id: userId,
         tag: trend.tag,
@@ -228,10 +230,13 @@ export async function runTrendDetection(userId: string): Promise<void> {
         severity_avg: tagData.severitySum / tagData.count,
         trend_direction: direction,
         description: trend.description,
-        previous_session_count: prevCount ?? 0,
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'user_id,tag' }
     )
+    if (upsertError) throw new Error(`Upsert failed for tag ${trend.tag}: ${upsertError.message}`)
   }
+
+  const insights = await generateTrendInsights(tagCounts, trendsWithDirection)
+  return insights
 }

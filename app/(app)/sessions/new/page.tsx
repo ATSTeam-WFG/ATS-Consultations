@@ -14,7 +14,6 @@ export default async function NewSessionPage({
   const { data: agents } = await db
     .from('agents')
     .select('id, name, agency_name')
-    .eq('user_id', user!.id)
     .order('name')
 
   return (

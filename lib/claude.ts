@@ -270,8 +270,8 @@ export async function detectTrends(
   tagCounts: { tag: string; count: number; agent_count: number; avg_severity: number }[]
 ): Promise<{ tag: string; description: string; category: string }[]> {
   const message = await anthropic.messages.create({
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: 1024,
+    model: 'claude-sonnet-4-6',
+    max_tokens: 2048,
     messages: [
       {
         role: 'user',
@@ -299,6 +299,38 @@ Return ONLY valid JSON, no markdown.`,
   } catch {
     return []
   }
+}
+
+// ============================================================
+// Prompt 6: Generate trend insights narrative
+// ============================================================
+export async function generateTrendInsights(
+  tagCounts: { tag: string; count: number; agent_count: number; avg_severity: number }[],
+  trends: { tag: string; description: string; category: string; direction?: string }[]
+): Promise<string> {
+  const enriched = tagCounts.map((tc) => ({
+    ...tc,
+    direction: trends.find((t) => t.tag === tc.tag)?.direction ?? 'stable',
+    category: trends.find((t) => t.tag === tc.tag)?.category ?? 'General',
+  }))
+
+  const message = await anthropic.messages.create({
+    model: 'claude-haiku-4-5-20251001',
+    max_tokens: 512,
+    messages: [
+      {
+        role: 'user',
+        content: `You are an expert title industry consultant. Analyze the following trend data from consultation sessions with title agents and write a 3-4 sentence executive narrative. Identify the most critical patterns, note any cross-agent issues, and recommend one specific action.
+
+Trend data:
+${JSON.stringify(enriched, null, 2)}
+
+Write only the narrative — no JSON, no bullet points, no headings. Be direct and specific.`,
+      },
+    ],
+  })
+
+  return message.content[0].type === 'text' ? message.content[0].text.trim() : ''
 }
 
 // ============================================================
