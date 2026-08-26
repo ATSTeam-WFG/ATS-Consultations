@@ -441,16 +441,18 @@ function Chip({ label, active, onClick }: { label: string; active: boolean; onCl
     <button
       onClick={onClick}
       style={{
-        padding: '0.3rem 0.75rem',
+        padding: '0.25rem 0.75rem',
         borderRadius: '9999px',
         fontSize: '0.8125rem',
         fontWeight: active ? 600 : 400,
-        border: active ? '1.5px solid var(--color-gold, #c4a574)' : '1px solid var(--border)',
-        background: active ? 'rgba(196,165,116,0.12)' : 'transparent',
-        color: active ? 'var(--foreground)' : 'var(--muted-foreground)',
+        border: '1px solid',
+        borderColor: active ? 'var(--color-gold, #c4a574)' : 'var(--border)',
+        background: active ? 'rgba(196,165,116,0.1)' : 'transparent',
+        color: active ? '#8a6c38' : 'var(--muted-foreground)',
         cursor: 'pointer',
         whiteSpace: 'nowrap',
-        transition: 'all 0.15s',
+        transition: 'border-color 0.15s, background 0.15s, color 0.15s',
+        lineHeight: '1.4',
       }}
     >
       {label}
@@ -597,105 +599,164 @@ export default function ToolsPage() {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            {/* Search bar */}
+            {/* Search + Filters card */}
             <div
               style={{
-                position: 'relative',
-                display: 'flex',
-                alignItems: 'center',
+                background: '#fff',
+                border: '1px solid var(--border)',
+                borderRadius: '12px',
+                overflow: 'hidden',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
               }}
             >
-              <Search
-                size={16}
-                style={{
-                  position: 'absolute',
-                  left: '0.875rem',
-                  color: 'var(--muted-foreground)',
-                  pointerEvents: 'none',
-                }}
-              />
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search tools by name, category, description…"
-                style={{
-                  width: '100%',
-                  padding: '0.625rem 2.5rem 0.625rem 2.5rem',
-                  borderRadius: '9999px',
-                  border: '1px solid var(--border)',
-                  fontSize: '0.875rem',
-                  outline: 'none',
-                  transition: 'border-color 0.15s, box-shadow 0.15s',
-                  background: '#fff',
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--color-gold, #c4a574)'
-                  e.currentTarget.style.boxShadow = '0 0 0 3px rgba(196,165,116,0.2)'
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--border)'
-                  e.currentTarget.style.boxShadow = 'none'
-                }}
-              />
-              {query && (
-                <button
-                  onClick={() => setQuery('')}
-                  aria-label="Clear search"
+              {/* Search bar */}
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <Search
+                  size={15}
                   style={{
                     position: 'absolute',
-                    right: '0.875rem',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
+                    left: '1rem',
                     color: 'var(--muted-foreground)',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    padding: '0.125rem',
+                    pointerEvents: 'none',
+                    opacity: 0.6,
+                  }}
+                />
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search tools by name, category, description…"
+                  style={{
+                    width: '100%',
+                    padding: '0.8125rem 2.75rem 0.8125rem 2.5rem',
+                    border: 'none',
+                    borderBottom: '1px solid var(--border)',
+                    fontSize: '0.9375rem',
+                    outline: 'none',
+                    background: 'transparent',
+                    color: 'var(--foreground)',
+                  }}
+                />
+                {query && (
+                  <button
+                    onClick={() => setQuery('')}
+                    aria-label="Clear search"
+                    style={{
+                      position: 'absolute',
+                      right: '1rem',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: 'var(--muted-foreground)',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      padding: '0.25rem',
+                      borderRadius: '9999px',
+                    }}
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+
+              {/* Filter row */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '0.625rem 1rem',
+                  gap: '0',
+                  overflowX: 'auto',
+                  scrollbarWidth: 'none',
+                }}
+              >
+                {/* Source group */}
+                <span
+                  style={{
+                    fontSize: '0.6875rem',
+                    fontWeight: 600,
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                    color: 'var(--muted-foreground)',
+                    whiteSpace: 'nowrap',
+                    marginRight: '0.5rem',
+                    flexShrink: 0,
                   }}
                 >
-                  <X size={14} />
-                </button>
-              )}
-            </div>
+                  Source
+                </span>
+                <div style={{ display: 'flex', gap: '0.3rem', flexShrink: 0 }}>
+                  {(['all', 'ats', 'external'] as const).map((s) => (
+                    <Chip
+                      key={s}
+                      label={s === 'all' ? 'All' : s === 'ats' ? 'ATS' : 'External'}
+                      active={filterSource === s}
+                      onClick={() => setFilterSource(s)}
+                    />
+                  ))}
+                </div>
 
-            {/* Filter chips */}
-            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
-              {/* Source chips */}
-              <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'nowrap', overflowX: 'auto' }}>
-                {(['all', 'ats', 'external'] as const).map((s) => (
-                  <Chip
-                    key={s}
-                    label={s === 'all' ? 'All Sources' : s === 'ats' ? 'ATS' : 'External'}
-                    active={filterSource === s}
-                    onClick={() => setFilterSource(s)}
-                  />
-                ))}
-              </div>
+                <div style={{ width: '1px', height: '1.25rem', background: 'var(--border)', margin: '0 0.875rem', flexShrink: 0 }} />
 
-              <div style={{ width: '1px', height: '1.5rem', background: 'var(--border)' }} />
+                {/* Category group */}
+                <span
+                  style={{
+                    fontSize: '0.6875rem',
+                    fontWeight: 600,
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                    color: 'var(--muted-foreground)',
+                    whiteSpace: 'nowrap',
+                    marginRight: '0.5rem',
+                    flexShrink: 0,
+                  }}
+                >
+                  Category
+                </span>
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '0.3rem',
+                    overflowX: 'auto',
+                    scrollbarWidth: 'none',
+                    flexShrink: 1,
+                    minWidth: 0,
+                  }}
+                >
+                  <Chip label="All" active={filterCategory === 'all'} onClick={() => setFilterCategory('all')} />
+                  {categories.map((cat) => (
+                    <Chip key={cat} label={cat} active={filterCategory === cat} onClick={() => setFilterCategory(cat)} />
+                  ))}
+                </div>
 
-              {/* Category chips */}
-              <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'nowrap', overflowX: 'auto' }}>
-                <Chip label="All Categories" active={filterCategory === 'all'} onClick={() => setFilterCategory('all')} />
-                {categories.map((cat) => (
-                  <Chip key={cat} label={cat} active={filterCategory === cat} onClick={() => setFilterCategory(cat)} />
-                ))}
-              </div>
+                <div style={{ width: '1px', height: '1.25rem', background: 'var(--border)', margin: '0 0.875rem', flexShrink: 0 }} />
 
-              <div style={{ width: '1px', height: '1.5rem', background: 'var(--border)' }} />
-
-              {/* Size chips */}
-              <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'nowrap', overflowX: 'auto' }}>
-                <Chip label="All Sizes" active={filterSize === 'all'} onClick={() => setFilterSize('all')} />
-                {ATS_SIZES.map((size) => (
-                  <Chip
-                    key={size}
-                    label={size.charAt(0).toUpperCase() + size.slice(1)}
-                    active={filterSize === size}
-                    onClick={() => setFilterSize(size)}
-                  />
-                ))}
+                {/* Size group */}
+                <span
+                  style={{
+                    fontSize: '0.6875rem',
+                    fontWeight: 600,
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                    color: 'var(--muted-foreground)',
+                    whiteSpace: 'nowrap',
+                    marginRight: '0.5rem',
+                    flexShrink: 0,
+                  }}
+                >
+                  Size
+                </span>
+                <div style={{ display: 'flex', gap: '0.3rem', flexShrink: 0 }}>
+                  <Chip label="All" active={filterSize === 'all'} onClick={() => setFilterSize('all')} />
+                  {ATS_SIZES.map((size) => (
+                    <Chip
+                      key={size}
+                      label={size.charAt(0).toUpperCase() + size.slice(1)}
+                      active={filterSize === size}
+                      onClick={() => setFilterSize(size)}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
 
