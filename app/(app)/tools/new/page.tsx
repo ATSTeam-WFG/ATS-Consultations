@@ -100,7 +100,7 @@ export default function NewToolPage() {
           </div>
 
           <div className="form-group">
-            <label className="form-label">ATS Size Fit</label>
+            <label className="form-label">Team Size</label>
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               {ATS_SIZES.map((size) => (
                 <button
@@ -108,14 +108,16 @@ export default function NewToolPage() {
                   type="button"
                   onClick={() => toggleSize(size)}
                   style={{
-                    padding: '0.3rem 0.75rem',
+                    padding: '0.3rem 0.875rem',
                     borderRadius: '9999px',
                     fontSize: '0.8125rem',
-                    fontWeight: 500,
-                    border: `1px solid ${atsSizeFit.includes(size) ? 'var(--ats-blue)' : 'var(--border)'}`,
-                    background: atsSizeFit.includes(size) ? 'var(--ats-blue-light)' : 'transparent',
-                    color: atsSizeFit.includes(size) ? 'var(--ats-blue-dark)' : 'var(--muted-foreground)',
+                    fontWeight: atsSizeFit.includes(size) ? 600 : 500,
+                    border: '1px solid',
+                    borderColor: atsSizeFit.includes(size) ? 'var(--ats-indigo)' : 'var(--border)',
+                    background: atsSizeFit.includes(size) ? 'var(--ats-indigo)' : 'transparent',
+                    color: atsSizeFit.includes(size) ? '#fff' : 'var(--muted-foreground)',
                     cursor: 'pointer',
+                    transition: 'all 0.15s',
                   }}
                 >
                   {size}

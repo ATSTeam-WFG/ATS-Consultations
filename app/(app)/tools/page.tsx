@@ -19,7 +19,7 @@ function highlight(text: string, ranges: readonly [number, number][] | undefined
       <mark
         key={start}
         style={{
-          background: 'rgba(196,165,116,0.25)',
+          background: 'rgba(99,102,241,0.15)',
           borderRadius: '2px',
           fontWeight: 600,
           color: 'inherit',
@@ -206,7 +206,7 @@ function ToolEditModal({ tool, onClose, onSave, onDelete }: ToolEditModalProps) 
             />
           </label>
           <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.875rem', fontWeight: 500 }}>
-            ATS Size Fit <span style={{ fontWeight: 400, color: 'var(--muted-foreground)' }}>(comma-separated)</span>
+            Team Size <span style={{ fontWeight: 400, color: 'var(--muted-foreground)' }}>(comma-separated)</span>
             <input
               className="ats-input"
               value={form.ats_size_fit}
@@ -322,7 +322,20 @@ function ToolRow({ tool, matches, onEdit }: ToolRowProps) {
       <td>
         <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
           {tool.ats_size_fit?.map((size) => (
-            <span key={size} className="badge badge-processed" style={{ fontSize: '0.6875rem' }}>
+            <span
+              key={size}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: '0.15rem 0.55rem',
+                borderRadius: '9999px',
+                fontSize: '0.6875rem',
+                fontWeight: 600,
+                background: 'var(--ats-indigo, #6366f1)',
+                color: '#fff',
+                letterSpacing: '0.02em',
+              }}
+            >
               {size}
             </span>
           ))}
@@ -412,7 +425,7 @@ function ToolSection({ title, tools, matchMap, onEdit }: SectionProps) {
             <tr>
               <th>Name</th>
               <th>Category</th>
-              <th>ATS Size Fit</th>
+              <th>Team Size</th>
               <th>Description</th>
               <th></th>
             </tr>
@@ -446,9 +459,9 @@ function Chip({ label, active, onClick }: { label: string; active: boolean; onCl
         fontSize: '0.8125rem',
         fontWeight: active ? 600 : 400,
         border: '1px solid',
-        borderColor: active ? 'var(--color-gold, #c4a574)' : 'var(--border)',
-        background: active ? 'rgba(196,165,116,0.1)' : 'transparent',
-        color: active ? '#8a6c38' : 'var(--muted-foreground)',
+        borderColor: active ? 'var(--ats-indigo, #6366f1)' : 'var(--border)',
+        background: active ? 'rgba(99,102,241,0.08)' : 'transparent',
+        color: active ? 'var(--ats-indigo-dark, #4f46e5)' : 'var(--muted-foreground)',
         cursor: 'pointer',
         whiteSpace: 'nowrap',
         transition: 'border-color 0.15s, background 0.15s, color 0.15s',
