@@ -10,6 +10,7 @@ export default function NewToolPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [atsSizeFit, setAtsSizeFit] = useState<string[]>([])
+  const [source, setSource] = useState<'ats' | 'external'>('external')
   const [form, setForm] = useState({
     name: '',
     category: '',
@@ -36,7 +37,7 @@ export default function NewToolPage() {
     const res = await fetch('/api/tools', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, ats_size_fit: atsSizeFit }),
+      body: JSON.stringify({ ...form, ats_size_fit: atsSizeFit, source }),
     })
     const json = await res.json()
 
@@ -56,6 +57,32 @@ export default function NewToolPage() {
       </div>
       <div className="page-body">
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', maxWidth: '640px' }}>
+          {/* Source toggle */}
+          <div className="form-group">
+            <label className="form-label">Source</label>
+            <div style={{ display: 'flex', borderRadius: '0.5rem', overflow: 'hidden', border: '1px solid var(--border)', width: 'fit-content' }}>
+              {(['ats', 'external'] as const).map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setSource(s)}
+                  style={{
+                    padding: '0.5rem 1.25rem',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    border: 'none',
+                    cursor: 'pointer',
+                    transition: 'background 0.15s, color 0.15s',
+                    background: source === s ? 'var(--color-gold, #c4a574)' : 'transparent',
+                    color: source === s ? '#fff' : 'var(--muted-foreground)',
+                  }}
+                >
+                  {s === 'ats' ? 'Developed by ATS' : 'External Recommended'}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <div className="form-group">
               <label className="form-label">Tool name *</label>

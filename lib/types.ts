@@ -144,6 +144,7 @@ export interface ToolRecommendation {
   max_tps: number | null
   website_url: string | null
   notes: string | null
+  source: 'ats' | 'external'
   created_at: string
   updated_at: string
 }
