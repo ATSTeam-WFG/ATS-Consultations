@@ -83,7 +83,57 @@ export async function GET() {
     top_category: topCategory,
   }
 
-  return NextResponse.json({ data: { trends, summary, categories, top_agents } })
+  // Severity distribution
+  const severityBuckets = { low: 0, medium: 0, high: 0, critical: 0 }
+  for (const t of trends) {
+    const avg = (t.severity_avg as number) ?? 0
+    if (avg >= 3.5) severityBuckets.critical++
+    else if (avg >= 2.5) severityBuckets.high++
+    else if (avg >= 1.5) severityBuckets.medium++
+    else severityBuckets.low++
+  }
+
+  // Direction over time — group by detected_at date + direction
+  const directionByDate: Map<string, { rising: number; stable: number; falling: number }> = new Map()
+  for (const t of trends) {
+    const date = (t.detected_at as string)?.slice(0, 10) ?? 'unknown'
+    const existing = directionByDate.get(date) ?? { rising: 0, stable: 0, falling: 0 }
+    const dir = (t.trend_direction as string) ?? 'stable'
+    if (dir === 'rising') existing.rising++
+    else if (dir === 'falling') existing.falling++
+    else existing.stable++
+    directionByDate.set(date, existing)
+  }
+  const direction_over_time = Array.from(directionByDate.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, counts]) => ({ date, ...counts }))
+
+  // Heatmap: tier × tag
+  const { data: agentTierData } = await db
+    .from('agents')
+    .select('id, category')
+  const agentTierMap = new Map<string, string>()
+  for (const a of agentTierData ?? []) {
+    if (a.id && a.category) agentTierMap.set(a.id as string, a.category as string)
+  }
+
+  const heatmapCounts: Map<string, number> = new Map()
+  for (const row of agentAnalyses ?? []) {
+    const session = row.sessions as unknown as { agent_id: string } | null
+    if (!session?.agent_id) continue
+    const tier = agentTierMap.get(session.agent_id)
+    if (!tier) continue
+    for (const tag of (row.problem_tags as string[]) ?? []) {
+      const key = `${tier}::${tag}`
+      heatmapCounts.set(key, (heatmapCounts.get(key) ?? 0) + 1)
+    }
+  }
+  const heatmap_data = Array.from(heatmapCounts.entries()).map(([key, count]) => {
+    const [tier, tag] = key.split('::')
+    return { tier, tag, count }
+  })
+
+  return NextResponse.json({ data: { trends, summary, categories, top_agents, severity_distribution: severityBuckets, heatmap_data, direction_over_time } })
 }
 
 export async function POST() {
