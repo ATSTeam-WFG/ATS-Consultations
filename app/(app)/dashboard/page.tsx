@@ -2,6 +2,8 @@ import { createServiceRoleClient } from '@/lib/supabase'
 import { DashboardStats } from '@/components/dashboard/DashboardStats'
 import type { Trend } from '@/lib/types'
 
+export const dynamic = 'force-dynamic'
+
 export default async function DashboardPage() {
   const db = createServiceRoleClient()
   const [

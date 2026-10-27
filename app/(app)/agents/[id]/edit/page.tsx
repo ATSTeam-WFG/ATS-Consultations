@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation'
 import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supabase'
 import { AgentForm } from '@/components/agents/AgentForm'
 
+export const dynamic = 'force-dynamic'
+
 export default async function EditAgentPage({
   params,
 }: {

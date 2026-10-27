@@ -3,6 +3,8 @@ import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supab
 import { PlaybookForm } from '@/components/playbooks/PlaybookForm'
 import type { Playbook } from '@/lib/types'
 
+export const dynamic = 'force-dynamic'
+
 export default async function EditPlaybookPage({
   params,
 }: {

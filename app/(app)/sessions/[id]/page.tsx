@@ -8,6 +8,8 @@ import { ReportBuilderButton } from '@/components/sessions/ReportBuilderButton'
 import { DeleteSessionButton } from '@/components/sessions/DeleteSessionButton'
 import type { SessionAnalysis, Playbook, PlaybookMatch } from '@/lib/types'
 
+export const dynamic = 'force-dynamic'
+
 export default async function SessionDetailPage({
   params,
 }: {

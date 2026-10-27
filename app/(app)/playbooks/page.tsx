@@ -4,6 +4,8 @@ import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supab
 import { PlaybookCard } from '@/components/playbooks/PlaybookCard'
 import type { Playbook } from '@/lib/types'
 
+export const dynamic = 'force-dynamic'
+
 export default async function PlaybooksPage() {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()

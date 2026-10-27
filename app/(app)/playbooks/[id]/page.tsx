@@ -4,6 +4,8 @@ import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supab
 import { Pencil, Clock, BarChart3, CheckCircle2, Users } from 'lucide-react'
 import type { Playbook, PlaybookStep, TitleAgentCategory } from '@/lib/types'
 
+export const dynamic = 'force-dynamic'
+
 const CATEGORY_BADGE: Record<TitleAgentCategory, string> = {
   UNICORN: 'badge-unicorn',
   DIAMOND: 'badge-diamond',
