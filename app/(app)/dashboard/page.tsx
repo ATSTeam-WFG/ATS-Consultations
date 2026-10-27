@@ -1,9 +1,8 @@
 import { createServiceRoleClient } from '@/lib/supabase'
-import { MetricCard } from '@/components/dashboard/MetricCard'
-import { TopProblemsChart } from '@/components/dashboard/TopProblemsChart'
-import { TrendAlerts } from '@/components/dashboard/TrendAlerts'
-import { TopPlaybooks } from '@/components/dashboard/TopPlaybooks'
+import { DashboardStats } from '@/components/dashboard/DashboardStats'
 import type { Trend } from '@/lib/types'
+
+export const dynamic = 'force-dynamic'
 
 export default async function DashboardPage() {
   const db = createServiceRoleClient()
@@ -19,13 +18,12 @@ export default async function DashboardPage() {
     db.from('agents').select('*', { count: 'exact', head: true }),
     db.from('sessions').select('*', { count: 'exact', head: true }),
     db.from('sessions').select('*', { count: 'exact', head: true }).eq('status', 'processed'),
-    db.from('sessions').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+    db.from('sessions').select('*', { count: 'exact', head: true }).in('status', ['pending', 'scheduled']),
     db.from('session_analysis').select('problem_tags'),
     db.from('trends').select('*').order('session_count', { ascending: false }).limit(5),
     db.from('playbooks').select('id, title, usage_count').order('usage_count', { ascending: false }).limit(5),
   ])
 
-  // Aggregate problem tags
   const tagMap = new Map<string, number>()
   for (const analysis of (analyses ?? [])) {
     const tags = (analysis.problem_tags as string[]) ?? []
@@ -44,25 +42,18 @@ export default async function DashboardPage() {
         <h1 className="page-title">Dashboard</h1>
       </div>
 
-      <div className="page-body" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-        {/* Metric cards */}
-        <div className="mob-grid-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
-          <MetricCard label="Agents" value={totalAgents ?? 0} />
-          <MetricCard label="Sessions" value={totalSessions ?? 0} />
-          <MetricCard label="Processed" value={processedSessions ?? 0} accent />
-          <MetricCard label="Pending" value={pendingSessions ?? 0} sub="awaiting analysis" />
-        </div>
-
-        {/* Charts row */}
-        <div className="mob-grid-1" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-          <TopProblemsChart data={topProblems} />
-          <TrendAlerts trends={(trends as Trend[]) ?? []} />
-        </div>
-
-        {/* Bottom row */}
-        <div className="mob-grid-1" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-          <TopPlaybooks playbooks={topPlaybooks ?? []} />
-        </div>
+      <div className="page-body">
+        <DashboardStats
+          initialData={{
+            totalAgents: totalAgents ?? 0,
+            totalSessions: totalSessions ?? 0,
+            processedSessions: processedSessions ?? 0,
+            pendingSessions: pendingSessions ?? 0,
+            topProblems,
+            trends: (trends as Trend[]) ?? [],
+            topPlaybooks: topPlaybooks ?? [],
+          }}
+        />
       </div>
     </>
   )

@@ -1,6 +1,8 @@
 import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supabase'
 import { CalendarGrid } from '@/components/calendar/CalendarGrid'
 
+export const dynamic = 'force-dynamic'
+
 export default async function CalendarPage() {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()

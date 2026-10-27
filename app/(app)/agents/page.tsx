@@ -3,6 +3,8 @@ import { Plus } from 'lucide-react'
 import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supabase'
 import type { TitleAgentCategory } from '@/lib/types'
 
+export const dynamic = 'force-dynamic'
+
 const CATEGORY_TIER: Record<TitleAgentCategory, string> = {
   UNICORN: 'tier-unicorn',
   DIAMOND: 'tier-diamond',

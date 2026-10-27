@@ -3,6 +3,8 @@ import { Plus } from 'lucide-react'
 import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supabase'
 import { SessionsClient } from '@/components/sessions/SessionsClient'
 
+export const dynamic = 'force-dynamic'
+
 export default async function SessionsPage() {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()

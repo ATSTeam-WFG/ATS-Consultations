@@ -6,6 +6,8 @@ import { AgentPlaybooks } from '@/components/agents/AgentPlaybooks'
 import { IntakeCard } from '@/components/agents/IntakeCard'
 import type { Session, TitleAgentCategory, Contact, AgentPlaybook, Playbook, IntakeToken, AgentIntake } from '@/lib/types'
 
+export const dynamic = 'force-dynamic'
+
 const CATEGORY_BADGE: Record<TitleAgentCategory, string> = {
   UNICORN: 'badge-unicorn',
   DIAMOND: 'badge-diamond',

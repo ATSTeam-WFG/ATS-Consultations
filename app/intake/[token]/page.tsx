@@ -3,6 +3,8 @@ import { createServiceRoleClient } from '@/lib/supabase'
 import { IntakeForm } from '@/components/intake/IntakeForm'
 import type { Contact, IntakeQuestion } from '@/lib/types'
 
+export const dynamic = 'force-dynamic'
+
 export default async function IntakePage({
   params,
 }: {

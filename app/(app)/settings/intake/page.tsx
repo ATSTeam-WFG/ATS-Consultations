@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation'
 import { IntakeQuestionsEditor } from '@/components/settings/IntakeQuestionsEditor'
 import type { IntakeQuestion } from '@/lib/types'
 
+export const dynamic = 'force-dynamic'
+
 export default async function IntakeSettingsPage() {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()

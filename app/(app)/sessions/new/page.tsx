@@ -1,6 +1,8 @@
 import { createServerSupabaseClient, createServiceRoleClient } from '@/lib/supabase'
 import { SessionForm } from '@/components/sessions/SessionForm'
 
+export const dynamic = 'force-dynamic'
+
 export default async function NewSessionPage({
   searchParams,
 }: {
