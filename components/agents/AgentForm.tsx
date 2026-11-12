@@ -7,11 +7,12 @@ import type { Agent, Contact, TitleAgentCategory } from '@/lib/types'
 interface AgentFormProps {
   initial?: Partial<Agent>
   agentId?: string
+  fromRequestId?: string
 }
 
 const CATEGORIES: TitleAgentCategory[] = ['UNICORN', 'DIAMOND', 'GOLD', 'SILVER']
 
-export function AgentForm({ initial, agentId }: AgentFormProps) {
+export function AgentForm({ initial, agentId, fromRequestId }: AgentFormProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -63,6 +64,13 @@ export function AgentForm({ initial, agentId }: AgentFormProps) {
     if (!res.ok) {
       setError(json.error ?? 'Something went wrong')
     } else {
+      if (fromRequestId) {
+        await fetch(`/api/requests/${fromRequestId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'converted', agent_id: json.data.id }),
+        })
+      }
       router.push(`/agents/${json.data.id}`)
       router.refresh()
     }

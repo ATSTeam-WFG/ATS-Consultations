@@ -145,6 +145,7 @@ export interface ToolRecommendation {
   website_url: string | null
   notes: string | null
   source: 'ats' | 'external'
+  bot_context: string | null
   created_at: string
   updated_at: string
 }
@@ -298,6 +299,56 @@ export interface IntakeQuestion {
   max_select: number | null
   display_order: number
   enabled: boolean
+}
+
+// ============================================================
+// Consultation Requests
+// ============================================================
+export interface ConsultationRequest {
+  id: string
+  agency_name: string
+  category: TitleAgentCategory
+  requested_time?: string | null
+  contacts: { name: string; role?: string; email: string }[]
+  status: 'pending' | 'converted' | 'dismissed'
+  agent_id?: string | null
+  submitted_at: string
+  created_at: string
+  rep_name?: string | null
+  rep_email?: string | null
+  region?: string | null
+  team_size?: string | null
+  topics?: string[] | null
+  situation?: string | null
+  notes?: string | null
+  request_source?: string | null
+  chat_transcript?: DiscoveryMessage[] | null
+  submitter_email?: string | null
+  closing_software?: string | null
+  request_type?: 'consultation' | 'product_setup' | 'tool_inquiry' | 'idea_pitch' | 'efficiency_help' | null
+}
+
+export type ConsultationRequestStatus = ConsultationRequest['status']
+
+// ============================================================
+// Discovery Bot
+// ============================================================
+export interface DiscoveryMessage {
+  role: 'user' | 'assistant'
+  content: string
+  suggestions?: string[]
+}
+
+export interface DiscoveryExtracted {
+  agency_name?: string
+  category?: TitleAgentCategory
+  region?: string
+  team_size?: string
+  closing_software?: string
+  topics?: string[]
+  situation?: string
+  request_type?: 'consultation' | 'product_setup' | 'tool_inquiry' | 'idea_pitch' | 'efficiency_help'
+  key_personnel?: { name: string; email?: string | null }[]
 }
 
 // ============================================================
