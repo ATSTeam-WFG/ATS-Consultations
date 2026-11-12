@@ -17,6 +17,7 @@ export default function NewToolPage() {
     description: '',
     website_url: '',
     notes: '',
+    bot_context: '',
   })
 
   function set(field: string, value: string) {
@@ -37,7 +38,7 @@ export default function NewToolPage() {
     const res = await fetch('/api/tools', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, ats_size_fit: atsSizeFit, source }),
+      body: JSON.stringify({ ...form, ats_size_fit: atsSizeFit, source, bot_context: form.bot_context || null }),
     })
     const json = await res.json()
 
@@ -135,6 +136,24 @@ export default function NewToolPage() {
             <label className="form-label">Notes</label>
             <textarea className="form-input" style={{ resize: 'vertical', minHeight: '60px' }} value={form.notes} onChange={(e) => set('notes', e.target.value)} placeholder="Any internal notes..." />
           </div>
+
+          {source === 'ats' && (
+            <div className="form-group">
+              <label className="form-label">
+                DiscoveryBot Context{' '}
+                <span style={{ fontWeight: 400, color: 'var(--muted-foreground)', fontSize: '0.75rem' }}>
+                  — What the bot knows about this product
+                </span>
+              </label>
+              <textarea
+                className="form-input"
+                style={{ resize: 'vertical', minHeight: '160px', fontFamily: 'monospace', fontSize: '0.8125rem' }}
+                value={form.bot_context}
+                onChange={(e) => set('bot_context', e.target.value)}
+                placeholder="Paste rich product knowledge here — the bot reads this at runtime..."
+              />
+            </div>
+          )}
 
           {error && <p style={{ fontSize: '0.875rem', color: 'var(--ats-danger)' }}>{error}</p>}
 

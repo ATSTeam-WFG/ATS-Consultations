@@ -57,6 +57,7 @@ function ToolEditModal({ tool, onClose, onSave, onDelete }: ToolEditModalProps) 
     website_url: tool.website_url ?? '',
     notes: tool.notes ?? '',
     source: tool.source ?? 'external',
+    bot_context: tool.bot_context ?? '',
   })
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
@@ -77,6 +78,7 @@ function ToolEditModal({ tool, onClose, onSave, onDelete }: ToolEditModalProps) 
           website_url: form.website_url || null,
           notes: form.notes || null,
           source: form.source,
+          bot_context: form.bot_context || null,
         }),
       })
       const j = await res.json()
@@ -234,6 +236,22 @@ function ToolEditModal({ tool, onClose, onSave, onDelete }: ToolEditModalProps) 
               style={{ resize: 'vertical' }}
             />
           </label>
+          {form.source === 'ats' && (
+            <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.875rem', fontWeight: 500 }}>
+              DiscoveryBot Context{' '}
+              <span style={{ fontWeight: 400, color: 'var(--muted-foreground)', fontSize: '0.75rem' }}>
+                — What the bot knows about this product
+              </span>
+              <textarea
+                className="ats-input"
+                value={form.bot_context}
+                onChange={(e) => setForm({ ...form, bot_context: e.target.value })}
+                placeholder="Paste rich product knowledge here — the bot reads this at runtime..."
+                rows={10}
+                style={{ resize: 'vertical', fontFamily: 'monospace', fontSize: '0.8125rem' }}
+              />
+            </label>
+          )}
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1.5rem' }}>

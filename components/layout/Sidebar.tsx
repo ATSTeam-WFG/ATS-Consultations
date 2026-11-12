@@ -14,6 +14,7 @@ import {
   MessageSquare,
   LogOut,
   Settings,
+  Inbox,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase-client'
 import { useRouter } from 'next/navigation'
@@ -36,6 +37,7 @@ const NAV = [
   {
     section: 'Core',
     items: [
+      { href: '/requests', label: 'New Requests', icon: Inbox, badge: true },
       { href: '/agents', label: 'Agents', icon: Users },
       { href: '/sessions', label: 'Sessions', icon: CalendarDays },
       { href: '/calendar', label: 'Calendar', icon: Calendar },
@@ -67,12 +69,20 @@ export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const [name, setName] = useState('')
+  const [pendingRequests, setPendingRequests] = useState(0)
 
   useEffect(() => {
     createClient().auth.getUser().then(({ data }) => {
       const email = data.user?.email?.toLowerCase() ?? ''
       setName(USER_NAMES[email] ?? email.split('@')[0])
     })
+  }, [])
+
+  useEffect(() => {
+    fetch('/api/requests')
+      .then((r) => r.json())
+      .then((j) => setPendingRequests((j.data ?? []).length))
+      .catch(() => {})
   }, [])
 
   async function handleSignOut() {
@@ -98,16 +108,33 @@ export function Sidebar() {
         {NAV.map((group) => (
           <div key={group.section}>
             <div className="sidebar-nav-section">{group.section}</div>
-            {group.items.map(({ href, label, icon: Icon }) => {
+            {group.items.map(({ href, label, icon: Icon, badge }) => {
               const isActive = pathname === href || pathname.startsWith(href + '/')
+              const badgeCount = badge ? pendingRequests : 0
               return (
                 <Link
                   key={href}
                   href={href}
                   className={`sidebar-nav-item ${isActive ? 'active' : ''}`}
+                  style={{ justifyContent: 'space-between' }}
                 >
-                  <Icon size={16} />
-                  {label}
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Icon size={16} />
+                    {label}
+                  </span>
+                  {badgeCount > 0 && (
+                    <span style={{
+                      padding: '0.0625rem 0.4375rem',
+                      background: 'var(--color-gold)',
+                      color: '#fff',
+                      borderRadius: '999px',
+                      fontSize: '0.7rem',
+                      fontWeight: 700,
+                      lineHeight: 1.4,
+                    }}>
+                      {badgeCount}
+                    </span>
+                  )}
                 </Link>
               )
             })}
