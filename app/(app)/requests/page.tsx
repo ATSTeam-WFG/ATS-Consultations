@@ -10,6 +10,7 @@ const CATEGORY_COLORS: Record<TitleAgentCategory, string> = {
   DIAMOND: '#0ea5e9',
   GOLD: '#c4a574',
   SILVER: '#6b7280',
+  PROSPECT: '#10b981',
 }
 
 export default function RequestsPage() {

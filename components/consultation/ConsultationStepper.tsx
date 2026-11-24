@@ -30,13 +30,14 @@ interface StepperState {
 }
 
 // ── Constants ──────────────────────────────────────────────────
-const CATEGORIES: TitleAgentCategory[] = ['UNICORN', 'DIAMOND', 'GOLD', 'SILVER']
+const CATEGORIES: TitleAgentCategory[] = ['UNICORN', 'DIAMOND', 'GOLD', 'SILVER', 'PROSPECT']
 
 const CATEGORY_COLORS: Record<TitleAgentCategory, string> = {
   UNICORN: '#7c3aed',
   DIAMOND: '#0ea5e9',
   GOLD: '#c9a45c',
   SILVER: '#6b7280',
+  PROSPECT: '#10b981',
 }
 
 const REGIONS = [

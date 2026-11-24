@@ -2,7 +2,7 @@ import { createServiceRoleClient, createServerSupabaseClient } from '@/lib/supab
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const VALID_CATEGORIES = ['UNICORN', 'DIAMOND', 'GOLD', 'SILVER']
+const VALID_CATEGORIES = ['UNICORN', 'DIAMOND', 'GOLD', 'SILVER', 'PROSPECT']
 
 export async function POST(req: NextRequest) {
   const body = await req.json()
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'agency_name is required' }, { status: 400 })
   }
   if (!category || !VALID_CATEGORIES.includes(category)) {
-    return NextResponse.json({ error: 'category must be one of UNICORN, DIAMOND, GOLD, SILVER' }, { status: 400 })
+    return NextResponse.json({ error: 'category must be one of UNICORN, DIAMOND, GOLD, SILVER, PROSPECT' }, { status: 400 })
   }
 
   const db = createServiceRoleClient()
