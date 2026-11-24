@@ -10,7 +10,7 @@ export type SessionType = 'walk_in' | 'zoom_call'
 export type PlaybookStatus = 'draft' | 'published' | 'archived'
 export type MessageRole = 'user' | 'assistant'
 export type Severity = 'low' | 'medium' | 'high' | 'critical'
-export type TitleAgentCategory = 'UNICORN' | 'DIAMOND' | 'GOLD' | 'SILVER'
+export type TitleAgentCategory = 'UNICORN' | 'DIAMOND' | 'GOLD' | 'SILVER' | 'PROSPECT'
 
 export interface Contact {
   name: string

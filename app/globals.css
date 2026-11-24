@@ -524,7 +524,8 @@
 .tier-diamond::before { color: #6366f1; }
 .tier-gold::before    { color: #d97706; }
 .tier-silver::before  { color: #94a3b8; }
-.tier-unicorn::before { color: #9333ea; }
+.tier-unicorn::before  { color: #9333ea; }
+.tier-prospect::before { color: #10b981; }
 
 /* ============================================================
    Q&A Markdown rendering

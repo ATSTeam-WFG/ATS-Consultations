@@ -6,6 +6,7 @@ const CATEGORY_TIER: Record<TitleAgentCategory, string> = {
   DIAMOND: 'tier-diamond',
   GOLD: 'tier-gold',
   SILVER: 'tier-silver',
+  PROSPECT: 'tier-prospect',
 }
 
 interface AgentCardProps {

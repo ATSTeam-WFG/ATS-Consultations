@@ -19,7 +19,7 @@ create table if not exists agents (
   name text not null,
   email text,
   agency_name text not null,
-  category text check (category in ('UNICORN', 'DIAMOND', 'GOLD', 'SILVER')),
+  category text check (category in ('UNICORN', 'DIAMOND', 'GOLD', 'SILVER', 'PROSPECT')),
   wfg_rep text,
   contacts jsonb default '[]',
   location text,

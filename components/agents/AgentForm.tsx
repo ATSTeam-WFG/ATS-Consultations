@@ -10,7 +10,7 @@ interface AgentFormProps {
   fromRequestId?: string
 }
 
-const CATEGORIES: TitleAgentCategory[] = ['UNICORN', 'DIAMOND', 'GOLD', 'SILVER']
+const CATEGORIES: TitleAgentCategory[] = ['UNICORN', 'DIAMOND', 'GOLD', 'SILVER', 'PROSPECT']
 
 export function AgentForm({ initial, agentId, fromRequestId }: AgentFormProps) {
   const router = useRouter()
