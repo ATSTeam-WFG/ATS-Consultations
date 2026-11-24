@@ -13,6 +13,7 @@ const CATEGORY_BADGE: Record<TitleAgentCategory, string> = {
   DIAMOND: 'badge-diamond',
   GOLD: 'badge-gold',
   SILVER: 'badge-silver',
+  PROSPECT: 'badge-prospect',
 }
 
 export default async function AgentDetailPage({
